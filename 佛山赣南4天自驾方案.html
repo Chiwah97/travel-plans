@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 赣南 · 4天3晚自驾方案（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 佛山出发 4天自驾江西赣南：赣州古城 + 龙南客家围屋 + 温泉，含路线充电、逐日行程、客家美食与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线与充电</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">吃在赣南</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 赣南</div>
+  <h1>佛山 ⇄ 赣南 4 天 3 晚</h1>
+  <p>赣州古城 + 龙南客家围屋 + 温泉 · 5 人纯电自驾</p>
+  <div class="tags">
+    <span>单程 442 km</span><span>高速免费</span><span>宋城免费</span>
+    <span>人均 ¥1,060–1,440</span><span>客家围屋</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>先说范围：4 天只能玩赣南</h2>
+  <p class="sub">江西是南北狭长的省，单程距离直接决定了 4 天能到哪里。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>目的地</th><th>单程里程</th><th>单程时长</th><th>4 天往返可行性</th></tr></thead>
+      <tbody>
+        <tr><td><b>赣州</b></td><td class="num">约 442 km</td><td class="num">约 5.5 小时</td><td><span class="pill g">可以</span> 首选</td></tr>
+        <tr><td>龙南</td><td class="num">约 441 km</td><td class="num">约 6 小时</td><td><span class="pill g">可以</span> 返程顺路</td></tr>
+        <tr><td>瑞金</td><td class="num">约 500 km</td><td class="num">约 6.5 小时</td><td><span class="pill o">勉强</span></td></tr>
+        <tr><td>井冈山（吉安）</td><td class="num">约 650 km</td><td class="num">约 7.5 小时</td><td><span class="pill r">太赶</span></td></tr>
+        <tr><td>武功山（萍乡）</td><td class="num">约 746 km</td><td class="num">约 8.6 小时</td><td><span class="pill r">不行</span></td></tr>
+        <tr><td>南昌</td><td class="num">约 865 km</td><td class="num">约 11 小时</td><td><span class="pill r">不行</span></td></tr>
+        <tr><td>三清山 / 婺源（上饶）</td><td class="num">约 971 km</td><td class="num">约 11 小时</td><td><span class="pill r">不行</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>判断依据：</b>4 天里至少有 2 天是纯赶路。单程超过 500 km，实际游览时间就被压到不足 2 天，不如不去。所以本方案锁定<b>赣州 + 赣南</b>——赣州古城、龙南围屋、温泉都在 130 km 半径内，且龙南正好在返程路上，不走回头路。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">最大优势</div>
+      <div class="v">宋城免费</div>
+      <div class="d">江南宋城历史文化旅游区（宋城墙、郁孤台、八境台、古浮桥、灶儿巷）全部免费，只需预约。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">核心约束</div>
+      <div class="v">补一次电</div>
+      <div class="d">单程 442km 几乎等于满电续航 450km，<b>实际必须中途补一次</b>。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">必须预约</div>
+      <div class="v">2 个点</div>
+      <div class="d">江南宋城需预约；通天岩国庆限流 5000 人、需预约。不预约可能进不去。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">时间建议</div>
+      <div class="v">10/2 – 10/5</div>
+      <div class="d">避开 9/30–10/1 出程高峰和 10/6–10/7 返程高峰。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。前两项是硬门槛。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约江南宋城 + 通天岩</div><div class="m">江南宋城免费但需预约；通天岩国庆分时段限流，白天限 5000 人、上午 10:30 起入园。<b>两个都要提前约，否则白跑。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订住宿（赣州 2 晚 + 龙南 1 晚）</div><div class="m">赣州市区国庆房源偏紧，龙南温泉酒店也热门。5 人订 2 间。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">出发前一晚把车充满</div><div class="m">单程 442km 几乎跑满 450km 续航，满电出发才有余量。中途一定要补。</div></div><span class="due p0">出发前夜</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">规划充电点并装好实时桩况 App</div><div class="m">主选<b>连平服务区</b>（G45 大广高速，4 台超充 + 32 台快充）。大广高速沿线新丰、连平、从化、吕田等 8 个服务区已建超充站。用"粤通行"查实时桩况。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备好雨具和薄外套</div><div class="m">赣州 10 月上旬 19–28℃，白天短袖、早晚加薄外套，山区多雨。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查景区国庆交通管制</div><div class="m">赣州古城国庆期间实行交通管制，小车需停周边停车场，再步行或经浮桥进入。提前看好停车场位置。</div></div><span class="due p1">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线与充电</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>路线</td><td>佛山 → <b>大广高速 G45</b>（经从化 → 新丰 → 连平 → 和平 → 江西龙南 → 赣州）</td></tr>
+        <tr><td>里程 / 时长</td><td class="num">约 442 km · 正常 5.5 小时</td></tr>
+        <tr><td>过路费</td><td>平时约 ¥220，<b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下）</td></tr>
+        <tr><td>续航消耗</td><td>满电续航 450 km → 单程消耗约 <b class="hi">98%</b>，中途必须补电</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>充电点规划</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>充电点</th><th>位置</th><th>桩位情况</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td><b>连平服务区</b></td><td>G45 大广高速 · 广东河源连平，距佛山约 250 km</td><td class="num">4 台超充 + 32 台快充</td><td><span class="pill g">主选</span> 去程返程都在这补，桩多且是超充</td></tr>
+        <tr><td>新丰 / 从化 / 吕田服务区</td><td>G45 大广高速 · 广东段</td><td>已建超充站，单枪最高 600 kW</td><td><span class="pill g">备选</span> 连平排队时往前或往后挪一站</td></tr>
+        <tr><td>万安服务区</td><td>G45 江西段</td><td class="num">20 个充电桩 / 40 把枪</td><td><span class="pill o">备选</span> 已过赣州方向，偏晚</td></tr>
+        <tr><td>瓦窑岗服务区</td><td>G4 京港澳 · 从化鳌头</td><td class="num">88 个充电车位</td><td><span class="pill b">另一条线</span> 走 G4 韶赣方案时才用得上</td></tr>
+        <tr><td>赣州市区</td><td>章贡区</td><td>全市已建成 252 根充电桩</td><td><span class="pill g">可靠</span> 酒店附近补电</td></tr>
+        <tr><td>龙南景区</td><td>关西围、虔心小镇等 4A 景区</td><td class="num">配套 720 kW 全液冷超充桩</td><td><span class="pill g">很好</span> 逛围屋时顺便充</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>充电节奏：</b>佛山满电 → 连平服务区充到 80%（约 40 分钟）→ 赣州。返程同理。<b>充到 80% 就走</b>，最后 20% 很慢。广东省交通运输厅已公布国庆 28 个"充电特别繁忙服务区"，出发当天用"粤通行"小程序查实时状态，排队超 30 分钟果断下高速充。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">两天在路上，两天在玩，节奏不赶。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">2</div></div>
+      <div><h4>佛山 → 赣州</h4><div class="meta">10 月 2 日 · 主区域：章贡区（赶路 + 宋城夜游）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">08:00</div><div class="tx"><b>佛山满电出发</b><small>大广高速 G45，避开 9/30–10/1 出程高峰</small></div></div>
+        <div class="row c"><div class="tm">11:00</div><div class="tx"><b>连平服务区补电</b><small>距佛山约 250 km，4 台超充 + 32 台快充，充到 80% 约 40 分钟</small></div></div>
+        <div class="row"><div class="tm">14:00</div><div class="tx"><b>抵赣州，午餐 + 入住</b><small>住章贡区，靠近古城</small></div></div>
+        <div class="row"><div class="tm">16:00</div><div class="tx"><b>古浮桥（建春门浮桥）</b><small><span class="pill g">免费</span> 八百多年历史的浮桥，仍在日常通行</small></div></div>
+        <div class="row f"><div class="tm">17:30</div><div class="tx"><b>灶儿巷</b><small><span class="pill g">免费</span> 明清古巷，客家老宅</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>客家菜晚餐</b><small>宁都三杯鸡、赣南小炒鱼、酿豆腐，人均约 ¥50–80</small></div></div>
+        <div class="row"><div class="tm">20:30</div><div class="tx"><b>郁孤台历史文化街区夜游</b><small><span class="pill g">免费</span> 需预约，9:00–21:30</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>为什么 D1 就逛古城：</b>14:00 到赣州，下午和晚上都是有效时间。古城景点集中在章贡区江边，步行就能串起来，不用开车。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">3</div></div>
+      <div><h4>赣州古城一日</h4><div class="meta">10 月 3 日 · 主区域：江南宋城 + 通天岩</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">08:30</div><div class="tx"><b>宋城墙 + 八境台</b><small><span class="pill g">免费·需预约</span> 宋代砖城墙，全国保存最完整之一</small></div></div>
+        <div class="row"><div class="tm">10:00</div><div class="tx"><b>福寿沟博物馆</b><small><span class="pill g">免费·需预约</span> 北宋地下排水系统，至今仍在用，周一闭馆</small></div></div>
+        <div class="row f"><div class="tm">11:30</div><div class="tx"><b>午餐</b><small>古城内或宋潮不夜城周边</small></div></div>
+        <div class="row f"><div class="tm">13:00</div><div class="tx"><b>通天岩</b><small>成人 ¥55（优待 ¥27.5）。<b>国庆分时段限流，上午 10:30 起入园、白天限 5000 人，需预约</b></small></div></div>
+        <div class="row"><div class="tm">17:00</div><div class="tx"><b>返回市区</b><small>通天岩距市区约 8–10 km</small></div></div>
+        <div class="row"><div class="tm">19:00</div><div class="tx"><b>宋潮不夜城</b><small>夜游、小吃，古城夜间氛围最好的一段</small></div></div>
+      </div>
+      <div class="callout danger"><b>通天岩是 D2 最大的不确定性：</b>国庆实行分时段限流，白天只放 5000 人且上午 10:30 才开始入园。<b>务必提前在线预约</b>，约不到就把 D2 下午改成赣州博物馆或郁孤台街区深度逛。</div>
+      <div class="callout ok" style="margin-bottom:0"><b>备选：</b>如果带孩子，可以把通天岩换成<b>赣州方特东方欲晓</b>（正价 ¥280/人，小童老人 ¥199），距市中心约 8.2 km。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D3</div><div class="n">4</div></div>
+      <div><h4>赣州 → 龙南客家围屋</h4><div class="meta">10 月 4 日 · 主区域：龙南（住温泉）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">08:30</div><div class="tx"><b>赣州出发 → 龙南</b><small>约 130 km，1.5 小时，大广高速一路向南</small></div></div>
+        <div class="row f"><div class="tm">10:00</div><div class="tx"><b>关西新围</b><small>门票约 ¥60。客家围屋的代表作，方形围屋、九厅十八井</small></div></div>
+        <div class="row f"><div class="tm">12:00</div><div class="tx"><b>午餐</b><small>龙南本地客家菜，酿豆腐、黄元米果</small></div></div>
+        <div class="row"><div class="tm">13:30</div><div class="tx"><b>栗园围</b><small>距龙南市区约 8 km。白天免费，夜间演艺 ¥50/人</small></div></div>
+        <div class="row"><div class="tm">15:30</div><div class="tx"><b>燕翼围</b><small><span class="pill g">免费</span> 在杨村太平古镇，最高的客家围屋，距市区约 35 km</small></div></div>
+        <div class="row c"><div class="tm">17:30</div><div class="tx"><b>入住龙南，车在景区超充站补电</b><small>关西围、虔心小镇等 4A 景区配套 720 kW 全液冷超充</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>晚餐 + 泡温泉</b><small>龙南温泉资源丰富，泡汤解乏</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>三座围屋必须自驾：</b>关西新围、栗园围、燕翼围不在同一景区，彼此相距 8–35 km，公共交通基本不可行。好在都在龙南境内，一天跑完不赶。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff3b30"><div class="d">D4</div><div class="n">5</div></div>
+      <div><h4>龙南 → 佛山</h4><div class="meta">10 月 5 日 · 返程</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">08:00</div><div class="tx"><b>龙南早市 / 早餐</b><small>艾米果、黄元米果、瑞金牛肉汤类小吃</small></div></div>
+        <div class="row"><div class="tm">09:30</div><div class="tx"><b>买伴手礼</b><small>南安板鸭、赣南脐橙（10 月刚上市）、客家米酒</small></div></div>
+        <div class="row t"><div class="tm">10:30</div><div class="tx"><b>龙南出发返程</b><small>约 441 km，直接沿大广高速南下，<b>不走回头路</b></small></div></div>
+        <div class="row c"><div class="tm">13:00</div><div class="tx"><b>连平服务区补电 + 午餐</b></div></div>
+        <div class="row"><div class="tm">17:00</div><div class="tx"><b>抵佛山</b><small>避开 10/6–10/7 返程高峰</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>为什么返程从龙南走：</b>龙南本来就在佛山北上的必经之路上，D3 从赣州向南到龙南、D4 从龙南直接南下回家，整条线是一个"上去—横移—下来"的闭环，没有回头路。这是选龙南而不是瑞金/三百山的核心理由。</div>
+    </div>
+  </div>
+
+  <h3>如果想把龙南换成别的</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>替换方案</th><th>玩法</th><th>代价</th></tr></thead>
+      <tbody>
+        <tr><td><b>安远三百山</b></td><td>东江源头，10/1–10/7 <b>免大门票</b>（平时约 ¥80），索道往返 ¥130，有高空栈道和玻璃观景台，约半天</td><td>在赣州东北方向，返程要多绕约 150 km，D4 会很累</td></tr>
+        <tr><td><b>瑞金</b></td><td>共和国摇篮，红井 ¥30、叶坪 ¥30，需凭身份证领免费参观券</td><td>在赣州东侧，不在返程线上，单程 500 km</td></tr>
+        <tr><td><b>崇义上堡梯田</b></td><td>门票约 ¥27.5，距赣州约 100 km</td><td>10 月上旬是否最佳观赏期无权威说明，有踩空风险</td></tr>
+        <tr><td><b>大余丫山</b></td><td>门票约 ¥29.9，含卧龙谷、玻璃桥、景区交通</td><td>距赣州约 130 km，体量偏小</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>吃在赣南</h2>
+  <p class="sub">客家菜的根在赣南，这一带的吃食比景点更值得期待。</p>
+
+  <h3>必点</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>菜</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>宁都三杯鸡</b></td><td>赣南最有名的一道，一杯米酒、一杯猪油、一杯酱油。本地口碑店人均约 ¥50–80</td></tr>
+        <tr><td><b>赣南小炒鱼</b></td><td>赣州本地做法，酸辣口，用草鱼</td></tr>
+        <tr><td>客家酿豆腐</td><td>客家菜基础款，龙南一带做得地道</td></tr>
+        <tr><td>艾米果 / 黄元米果</td><td>米制小吃，街头和早市都有</td></tr>
+        <tr><td>瑞金牛肉汤</td><td>瑞金名小吃，早餐配粉</td></tr>
+        <tr><td>兴国米粉鱼</td><td>米粉蒸鱼，赣南传统</td></tr>
+        <tr><td>南安板鸭</td><td>大余南安特产，适合买回去</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>去哪吃</h3>
+  <div class="callout info">
+    <b>赣州市区：</b>灶儿巷、郁孤台历史文化街区是免费开放的历史文化街区，适合步行和夜游，周边餐饮集中；古城周边可优先停<b>宋潮不夜城、大新开路、宋街</b>等停车场。<br>
+    <b>宁都三杯鸡：</b>本地推荐沙洲坝赣南菜馆等，人均约 ¥50–80。<br>
+    <b>龙南：</b>围屋景区周边和县城以客家菜为主，酿豆腐、黄元米果常见。
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">赣南小炒鱼、兴国米粉鱼、南安板鸭的本地口碑单店，本次未检索到可核验的权威推荐，建议到店看本地人流量选择。</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1（10/2）</td><td>赣州 章贡区</td><td class="num">约 ¥300–450/间</td><td>住古城附近，晚上步行去郁孤台、宋潮不夜城</td></tr>
+        <tr><td>D2（10/3）</td><td>赣州 章贡区</td><td class="num">约 ¥300–450/间</td><td>连住两晚，不用搬行李</td></tr>
+        <tr><td>D3（10/4）</td><td>龙南</td><td class="num">约 ¥252–400/间</td><td>优先选带温泉的酒店，泡汤解乏</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>预订提示：</b>赣州市区国庆房源偏紧、价格上浮；龙南温泉酒店假期也热门。5 人订 2 间（1 大床 + 1 双床）。赣州连住两晚可以减少搬行李的麻烦。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">5 人、纯电、4 天 3 晚。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（5 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>过路费</b></td><td>国庆免费（平时约 ¥220 × 2）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td><b>电费</b></td><td>总里程约 1,083 km（往返 883 + 当地 200），约 173 kWh，快充 ¥1.2–1.8/kWh</td><td class="num">¥210–310</td><td class="num">¥42–62</td></tr>
+        <tr><td><b>住宿</b></td><td>2 间 × 3 晚（赣州 ¥300–450、龙南 ¥252–400）</td><td class="num">¥1,700–2,600</td><td class="num">¥340–520</td></tr>
+        <tr><td><b>餐饮</b></td><td>客家菜为主，人均 ¥100–150/天 × 4 天</td><td class="num">¥2,000–3,000</td><td class="num">¥400–600</td></tr>
+        <tr><td>门票</td><td>通天岩 ¥55×5 + 关西新围 ¥60×5 + 温泉 ¥108×5（古城、燕翼围、古浮桥免费）</td><td class="num">¥1,115</td><td class="num">¥223</td></tr>
+        <tr><td>停车杂费</td><td>古城周边停车场、景区停车</td><td class="num">¥200–300</td><td class="num">¥40–60</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥5,225–7,325</td><td class="num hi">约 ¥1,045–1,465</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>古城景点全免费，把游览重心放在江南宋城</td><td class="num ok">门票几乎归零</td></tr>
+        <tr><td>砍掉温泉（¥108/人）</td><td class="num ok">省 ¥540</td></tr>
+        <tr><td>砍掉通天岩，改逛免费的福寿沟博物馆 + 古城墙</td><td class="num ok">省 ¥275</td></tr>
+        <tr><td>出发前在家充满（谷电约 ¥0.6/kWh）</td><td class="num ok">省 ¥100–150</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">预约与限流</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>江南宋城（宋城墙、郁孤台、八境台）<b>免费但需预约</b></li>
+        <li>通天岩国庆分时段限流，<b>白天限 5000 人、10:30 起入园</b></li>
+        <li>福寿沟博物馆免费需预约，<b>周一闭馆</b></li>
+        <li>瑞金凭身份证领免费参观券，团队需提前两天预约</li>
+        <li>江西文旅厅提示：热门景区建议官方渠道实名预约、分时入园</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">电车与高速</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>单程 442 km 几乎跑满 450 km 续航，<b>中途必须补电</b></li>
+        <li>主选连平服务区（超充 4 台 + 快充 32 台）</li>
+        <li>广东国庆有 <b>28 个"充电特别繁忙服务区"</b>，当天查实时状态</li>
+        <li>排队超 30 分钟就下高速充，充到 80% 就走</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">古城与自驾</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>赣州古城国庆实行交通管制，小车需停周边停车场</li>
+        <li>优先停宋潮不夜城、大新开路、宋街停车场</li>
+        <li>古城街巷窄，步行体验远好于开车</li>
+        <li>三座围屋相距 8–35 km，<b>必须自驾</b>，公共交通不可行</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">时间与天气</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>出程高峰 9/30–10/1，返程高峰 10/6–10/7，建议 10/2 走、10/5 回</li>
+        <li>高速免费到 10/7 24:00</li>
+        <li>赣州 10 月上旬 19–28℃，白天短袖、早晚薄外套</li>
+        <li>山区多雨，带雨具</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  2026 国庆高速免费与广东车流研判 · <a href="http://news.dayoo.com/guangdong/202609/30/139996_55009161.htm" target="_blank">大洋网</a><br>
+  广东省交通运输厅双节出行研判 · <a href="https://td.gd.gov.cn/gkmlpt/content/4/4962/post_4962132.html" target="_blank">td.gd.gov.cn</a><br>
+  大广高速沿线超充站建设 · <a href="https://epaper.nfnews.com/m/ipaper/nfrb/html/202501/27/content_10125453.html" target="_blank">南方日报</a><br>
+  大广高速万安服务区充电桩 · <a href="https://jt.jxnews.com.cn/system/2026/06/12/031161016.shtml" target="_blank">江西新闻网</a><br>
+  龙南景区超充桩建设 · <a href="http://www.jxln.gov.cn/lnxxxgk/xczx/202609/9d5fde367a404803b212b5a2857a56bf.shtml" target="_blank">龙南市政府</a><br>
+  赣州充电桩建设 · <a href="https://tt.jxnews.com.cn/news/2862359" target="_blank">江西新闻网</a><br>
+  通天岩国庆限流 · <a href="http://www.gztig.com/Home/Article/detail/id/2357.html" target="_blank">通天岩景区</a><br>
+  江南宋城景区信息 · <a href="https://gzsbwg.cn/2441.html" target="_blank">赣州市博物馆</a><br>
+  江西省文旅厅国庆预约提示 · <a href="http://dct.jiangxi.gov.cn/jxswhhlyt/col/col5296/content/content_2101514580666167296.html" target="_blank">江西省文旅厅</a><br>
+  瑞金共和国摇篮景区参观须知 · <a href="http://www.rjjng.com.cn/cgzn.thtml?id=11111" target="_blank">瑞金景区</a><br>
+  三百山景区 · <a href="http://www.sbsjq.cn/index/zhcn/home" target="_blank">三百山官网</a>
+  <p style="margin-top:14px">里程、价格、限流规则均为 2026 年 9 月 30 日检索口径，国庆期间浮动较大。<b>景区预约名额与充电桩实时状态请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→赣州', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1220,t:'transport',d:'满电出发，大广高速G45'},
+    {n:'连平服务区（大广高速）',city:'连平',lat:24.3300,lng:114.4400,t:'charge',d:'4台超充+32台快充，主选补电点'},
+    {n:'赣州章贡区',city:'赣州',lat:25.8510,lng:114.9330,t:'hotel',d:'入住，靠近古城'},
+    {n:'古浮桥（建春门）',city:'赣州',lat:25.8745,lng:114.9437,t:'spot',d:'免费，八百多年历史'},
+    {n:'灶儿巷',city:'赣州',lat:25.8662,lng:114.9394,t:'food',d:'免费，明清古巷'},
+    {n:'郁孤台历史文化街区',city:'赣州',lat:25.8686,lng:114.9339,t:'spot',d:'免费需预约，9:00-21:30'}
+  ]},
+  d2:{label:'D2 赣州古城', color:'#af52de', pts:[
+    {n:'赣州宋城墙',city:'赣州',lat:25.8745,lng:114.9437,t:'spot',d:'免费需预约'},
+    {n:'八境台',city:'赣州',lat:25.8787,lng:114.9403,t:'spot',d:'免费需预约'},
+    {n:'福寿沟博物馆',city:'赣州',lat:25.8590,lng:114.9280,t:'spot',d:'免费需预约，周一闭馆'},
+    {n:'通天岩',city:'赣州',lat:25.9168,lng:114.8383,t:'spot',d:'成人55元，国庆限流5000人需预约'},
+    {n:'宋潮不夜城',city:'赣州',lat:25.8660,lng:114.9380,t:'food',d:'夜游、小吃'}
+  ]},
+  d3:{label:'D3 赣州→龙南', color:'#34c759', pts:[
+    {n:'赣州章贡区',city:'赣州',lat:25.8510,lng:114.9330,t:'transport',d:'出发，约130km到龙南'},
+    {n:'关西新围',city:'龙南',lat:24.8420,lng:114.6800,t:'spot',d:'门票约60元，客家围屋代表'},
+    {n:'栗园围',city:'龙南',lat:24.8700,lng:114.8200,t:'spot',d:'白天免费，夜间演艺50元'},
+    {n:'燕翼围',city:'龙南',lat:24.6380,lng:114.5820,t:'spot',d:'免费，最高的客家围屋'},
+    {n:'龙南市区',city:'龙南',lat:24.9108,lng:114.7894,t:'hotel',d:'入住+温泉，景区有720kW超充'}
+  ]},
+  d4:{label:'D4 龙南→佛山', color:'#ff3b30', pts:[
+    {n:'龙南市区',city:'龙南',lat:24.9108,lng:114.7894,t:'transport',d:'早市买伴手礼后返程'},
+    {n:'连平服务区（大广高速）',city:'连平',lat:24.3300,lng:114.4400,t:'charge',d:'返程补电+午餐'},
+    {n:'佛山（返抵）',city:'佛山',lat:23.0218,lng:113.1220,t:'transport',d:'约17:00抵达'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[25.2,114.6],zoom:7,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent(p.city+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>

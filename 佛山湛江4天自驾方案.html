@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 湛江 · 4天3晚自驾方案（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 佛山出发 4天自驾湛江（东海岛+硇洲岛）看海吃海鲜，含路线充电、逐日行程、海鲜攻略与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线与充电</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">海鲜攻略</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 粤西</div>
+  <h1>佛山 ⇄ 湛江 4 天 3 晚</h1>
+  <p>东海岛 + 硇洲岛 · 看海吃海鲜 · 5 人纯电自驾</p>
+  <div class="tags">
+    <span>单程 393 km</span><span>高速免费</span><span>硇洲岛车可上</span>
+    <span>人均 ¥1,100–1,600</span><span>无需预约</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>结论先行</h2>
+  <p class="sub">这条线是"海鲜天花板 + 零预约门槛"的组合，唯一要算清的是电。</p>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">最大优势</div>
+      <div class="v">不用预约</div>
+      <div class="d">湛江全线无预约门槛。对比深圳大鹏（必须预约，未预约罚款扣分）、南澳岛（需提前 7 天预约），这里说走就走。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">核心约束</div>
+      <div class="v">补一次电</div>
+      <div class="d">单程 393km，占满电续航约 87%。国庆堵车 + 空调实际更耗，<b>必须中途补一次</b>。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">最大变数</div>
+      <div class="v">硇洲岛轮渡</div>
+      <div class="d">车渡整点发船、受潮水影响会停航 2–4 小时，节假日排队久。这是全程唯一可能打乱节奏的环节。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">时间建议</div>
+      <div class="v">10/2 – 10/5</div>
+      <div class="d">避开 9/30–10/1 出程高峰和 10/6–10/7 返程高峰，两头都顺。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>海鲜正当季：</b>2026 年南海伏季休渔 5 月 1 日 12 时至 8 月 16 日 12 时，10 月已完全开海，供应充足、价格回落。湛江是"蚝乡"，生蚝、花蟹、对虾、石斑都在当季。
+  </div>
+  <div class="callout warn">
+    <b>行程节奏：</b>D1 赶路 + 逛市场，D2 硇洲岛住一晚，D3 离岛顺路玩东海岛，D4 市区收尾返程。硇洲岛住一晚是刻意的——下午离岛的渡轮排队最凶。
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">出发前一晚把车充满</div><div class="m">单程 393km，满电出发才有余量。别指望在服务区现充——国庆排队是常态。</div></div><span class="due p0">出发前夜</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订住宿（湛江市区 2 晚 + 硇洲岛 1 晚）</div><div class="m">硇洲岛民宿数量有限，开渔季和节假日曾有订满的情况。<b>硇洲岛那晚最要紧，先订它。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查硇洲岛轮渡当日通航状态</div><div class="m">车渡受潮水影响会临时停航 2–4 小时。出发前一天打码头电话或查湛江本地宝确认班次。</div></div><span class="due p1">出发前一天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">规划沿途充电点并加好 App</div><div class="m">主选<b>大槐服务区</b>（阳江段，约 86 个充电车位，全线最充裕）；备选雷州服务区、白沙停车区。装好高德/百度地图的新能源模式，看实时桩况。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">准备海鲜采购装备</div><div class="m">保温箱 + 冰袋（带海鲜回佛山）、小电子秤（复核重量）、湿巾。市场里用得上。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查台风与海况预警</div><div class="m">10 月上旬广东沿海仍有台风风险，直接影响轮渡通航和海边行程。出发前 3 天查中央气象台。</div></div><span class="due p1">出发前 3 天</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线与充电</h2>
+  <p class="sub">这是本次行程最需要算清楚的部分。切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>路线</td><td>佛山 → <b>沈海高速 G15</b>（佛开 → 开阳 → 阳茂 → 茂湛）→ 湛江</td></tr>
+        <tr><td>里程 / 时长</td><td class="num">约 393 km · 正常 4.7–5.5 小时</td></tr>
+        <tr><td>过路费</td><td>平时约 ¥180，<b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下）</td></tr>
+        <tr><td>续航消耗</td><td>满电续航 450 km → 单程消耗约 <b>87%</b>（堵车 + 空调实际更高）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>充电点规划</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>充电点</th><th>位置</th><th>桩位情况</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td><b>大槐服务区</b></td><td>阳江恩平段，距佛山约 200 km</td><td class="num">约 86 个充电车位</td><td><span class="pill g">主选</span> 全线最充裕，去程返程都在这补</td></tr>
+        <tr><td>雷州服务区</td><td>湛江雷州段</td><td class="num">12 个充电车位（含 2 个超充）</td><td><span class="pill o">备选</span> 已进湛江地界，桩少</td></tr>
+        <tr><td>白沙停车区</td><td>湛江段</td><td class="num">2 个充电桩</td><td><span class="pill r">应急</span> 桩太少，别指望</td></tr>
+        <tr><td>良西服务区</td><td>沈海高速沿线</td><td>已列入省级"充电繁忙"名单</td><td><span class="pill r">避开</span> 国庆大概率排队</td></tr>
+        <tr><td>湛江市区</td><td>霞山 / 赤坎</td><td>桩位充足</td><td><span class="pill g">可靠</span> D2 上岛前在这里充满</td></tr>
+        <tr><td>硇洲岛</td><td>硇洲镇</td><td class="num">10 个充电桩</td><td><span class="pill o">别依赖</span> 岛内环岛仅约 40 km，市区充满就够，不需要在岛上充</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>充电节奏建议：</b>佛山满电 → 大槐服务区充到 80%（约 40 分钟）→ 湛江市区。返程同样在大槐补一次。<b>充到 80% 就走</b>，最后 20% 很慢且国庆桩位紧张。如果服务区排队超过 30 分钟，果断下高速，到出口 5 公里内的商场或酒店充电，通常更快。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天一个主区域，不赶场。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">2</div></div>
+      <div><h4>佛山 → 湛江市区</h4><div class="meta">10 月 2 日 · 主区域：霞山（赶路 + 海鲜市场）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:00</div><div class="tx"><b>佛山满电出发</b><small>沈海高速 G15，避开 9/30–10/1 出程高峰</small></div></div>
+        <div class="row c"><div class="tm">09:30</div><div class="tx"><b>大槐服务区补电</b><small>距佛山约 200 km，约 86 个充电车位，充到 80% 约 40 分钟</small></div></div>
+        <div class="row"><div class="tm">12:30</div><div class="tx"><b>抵湛江霞山，午餐</b><small>先吃碗牛杂或猪肠粉垫一下</small></div></div>
+        <div class="row"><div class="tm">14:00</div><div class="tx"><b>入住霞山区</b><small>近观海长廊，方便晚上散步</small></div></div>
+        <div class="row"><div class="tm">15:30</div><div class="tx"><b>霞山观海长廊 + 渔港公园</b><small>看渔船、吹海风，免费</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>霞山水产品批发市场</b><small>胜利长堤 4 号。下午 3–7 时是渔船回港高峰，这时候去最新鲜</small></div></div>
+        <div class="row f"><div class="tm">19:30</div><div class="tx"><b>海鲜大餐</b><small>市场买完找周边大排档加工，加工费约 ¥15/斤起</small></div></div>
+        <div class="row"><div class="tm">21:00</div><div class="tx"><b>金沙湾观海长廊夜景</b></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>为什么 D1 就去市场：</b>湛江的海鲜市场一天有两个回港高峰（清晨 5–9 时、下午 3–7 时）。下午这一波刚好卡在到达后，不用早起，也不耽误第二天上岛。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">3</div></div>
+      <div><h4>湛江 → 硇洲岛（住岛上）</h4><div class="meta">10 月 3 日 · 主区域：硇洲岛</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">06:30</div><div class="tx"><b>市区出发 → 东南码头</b><small>约 40 km，1 小时。出发前把车充满</small></div></div>
+        <div class="row t"><div class="tm">07:30</div><div class="tx"><b>东南码头车渡上岛</b><small>小车 ¥78/辆，乘客另收 ¥10/人。10 月 1 日起冬季班次整点发船，07:00–17:30 每小时一班，渡海约 30 分钟</small></div></div>
+        <div class="row"><div class="tm">09:00</div><div class="tx"><b>硇洲灯塔</b><small><span class="pill g">免费</span> 含灯塔文化公园、航标知识展览馆</small></div></div>
+        <div class="row"><div class="tm">11:00</div><div class="tx"><b>那晏海石滩 / 存亮湾</b><small>火山岩海岸，人少水清</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>岛上海鲜午餐</b><small>硇洲以龙虾、鲍鱼、大虾、白鲳、石斑、海胆闻名。两人三菜一汤约 ¥50–80/人</small></div></div>
+        <div class="row"><div class="tm">14:30</div><div class="tx"><b>硇洲渔港</b><small>看归港渔船，傍晚还有一波鲜货</small></div></div>
+        <div class="row"><div class="tm">17:30</div><div class="tx"><b>入住岛上民宿</b><small>住一晚，避开下午离岛的渡轮长队</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>渔港边晚餐</b><small>自己买海鲜找民宿代加工，白灼约 ¥10/份、清蒸约 ¥15/份</small></div></div>
+      </div>
+      <div class="callout danger"><b>轮渡是全程最大变数：</b>车渡受潮水影响会停航，一般 2–4 小时。节假日车辆排队时间长，如果到码头发现队太长，<b>果断把车停东南码头停车场，人坐船过去</b>——岛内环岛才约 40 km，打车或坐电瓶车也能玩。</div>
+      <div class="callout ok" style="margin-bottom:0"><b>电车提示：</b>硇洲岛只有 10 个充电桩，别指望岛上充。岛内行驶距离很短，市区充满就完全够用。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D3</div><div class="n">4</div></div>
+      <div><h4>硇洲岛 → 东海岛 → 湛江市区</h4><div class="meta">10 月 4 日 · 主区域：东海岛东岸</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row"><div class="tm">07:30</div><div class="tx"><b>岛上早餐 + 赶早班船离岛</b><small>越早越不用排队</small></div></div>
+        <div class="row t"><div class="tm">09:00</div><div class="tx"><b>回到东南码头，取车</b></div></div>
+        <div class="row"><div class="tm">10:00</div><div class="tx"><b>东海岛 · 龙海天沙滩</b><small>中国第一长滩，停车费 ¥10/天，路边有少量免费位</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>东海岛午餐</b><small>沙滩附近海鲜排档，注意看秤</small></div></div>
+        <div class="row"><div class="tm">14:30</div><div class="tx"><b>湖光岩</b><small>世界地质公园，玛珥湖。门票 ¥50/人（学生、退休人员 ¥25）</small></div></div>
+        <div class="row"><div class="tm">17:30</div><div class="tx"><b>返回湛江市区，入住霞山/赤坎</b></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>晚餐：炭烤生蚝</b><small>烧蚝帮·湛江生蚝（工农店）人均约 ¥81；或荣记生蚝鸡煲</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>顺路逻辑：</b>硇洲岛就在东海岛东南侧，东南码头本来就在东海岛上。离岛后直接沿东海岛北上到龙海天沙滩，再回市区，完全顺路，不走回头路。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff3b30"><div class="d">D4</div><div class="n">5</div></div>
+      <div><h4>湛江市区 → 佛山</h4><div class="meta">10 月 5 日 · 主区域：赤坎老街</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>湛江早茶</b><small>湛江早茶是本地一绝，白切鸡、牛杂、簸箕炊都值得点</small></div></div>
+        <div class="row"><div class="tm">09:00</div><div class="tx"><b>赤坎老街</b><small>骑楼老街、广州湾历史建筑，免费</small></div></div>
+        <div class="row"><div class="tm">10:30</div><div class="tx"><b>买海味干货伴手礼</b><small>虾米、瑶柱、鱿鱼干、沙虫干。已买的鲜货装保温箱加冰</small></div></div>
+        <div class="row f"><div class="tm">11:30</div><div class="tx"><b>午餐</b><small>出发前最后一顿，四爹簸箕炊（06:30–14:00）可顺路</small></div></div>
+        <div class="row t"><div class="tm">13:00</div><div class="tx"><b>湛江出发返程</b><small>沈海高速 G15，避开 10/6–10/7 返程高峰</small></div></div>
+        <div class="row c"><div class="tm">15:30</div><div class="tx"><b>大槐服务区补电</b></div></div>
+        <div class="row"><div class="tm">19:00</div><div class="tx"><b>抵佛山</b></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>备选（如果你更想多玩一天海边）：</b>D4 上午改去<b>特呈岛</b>（湛江湾内，往返船票 + 电瓶车环岛双人票约 ¥88），下午再返程，到佛山会比较晚。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>海鲜攻略</h2>
+  <p class="sub">自己买 + 找加工店，是湛江吃海鲜最划算也最地道的方式。</p>
+
+  <h3>去哪儿买</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>市场</th><th>位置</th><th>特点</th></tr></thead>
+      <tbody>
+        <tr><td><b>霞山水产品批发市场</b>（东风市场 / 渔人码头）</td><td>霞山区胜利长堤 4 号</td><td>批发零售兼有，<b>清晨 5–9 时、下午 3–7 时</b>渔船回港高峰；入口有公平秤，周边大排档可代加工</td></tr>
+        <tr><td>赤坎南华市场</td><td>赤坎区</td><td>市民常去的综合市场，开渔时价格随行就市</td></tr>
+        <tr><td>硇洲渔港</td><td>硇洲岛码头周边</td><td>湛江较大的渔港之一，傍晚归港时可见鲜货，码头附近可买可加工</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>大概什么价（2026 年公开行情，仅供比价）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>品种</th><th>参考价</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr><td>生蚝（带壳）</td><td class="num">¥3–7/斤</td><td>湛江是"蚝乡"，年产量超 40 万吨，最便宜也最稳</td></tr>
+        <tr><td>花蟹</td><td class="num">约 ¥65/斤</td><td>开渔后价格明显回落</td></tr>
+        <tr><td>皮皮虾</td><td class="num">¥20–35/斤</td><td>不同渠道口径差异大，现场比价</td></tr>
+        <tr><td>花螺 / 东风螺</td><td class="num">¥40–50/斤</td><td></td></tr>
+        <tr><td>沙虫</td><td class="num">约 ¥83/斤</td><td>湛江特色，价格偏高但值得试一次</td></tr>
+        <tr><td>明虾</td><td class="num">¥30–40/斤</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2);margin-top:8px">以上为批发/行情口径，零售和国庆期间会更高。现场以实际挂牌价为准。</p>
+
+  <h3>加工店怎么算</h3>
+  <div class="callout info">
+    霞山渔人码头周边大排档：<b>加工费约 ¥15/斤起</b>，白灼、清蒸、椒盐、蒜蓉可议价。<br>
+    霞山水产品批发市场周边加工饭店：白灼、清蒸按品类<b>每斤 ¥3–30 不等</b>。<br>
+    硇洲岛：常按份收费，<b>白灼约 ¥10/份、清蒸约 ¥15/份、小菜约 ¥8/份</b>。<br>
+    <b>加工前务必确认：</b>是否包含杀洗、按斤还是按份计费。
+  </div>
+
+  <h3>餐厅备选（不想自己动手时）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>类型</th><th>推荐</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>炭烤生蚝</td><td>烧蚝帮·湛江生蚝（工农店）</td><td>霞山区工农路霞山西村 3 号，人均约 ¥81</td></tr>
+        <tr><td>生蚝 / 鸡煲</td><td>荣记生蚝鸡煲（荣盛）</td><td>现开官渡生蚝 + 湛江猪肚鸡</td></tr>
+        <tr><td>白切鸡</td><td>金紫荆酒楼、悦景轩、口衣记酒楼</td><td>湛江市商务局餐饮名店名单内</td></tr>
+        <tr><td>牛杂</td><td>南有麻章鲜牛杂（赤坎店）</td><td>麻章老味道，30 年老店</td></tr>
+        <tr><td>小吃</td><td>四爹簸箕炊</td><td>06:30–14:00，配湖光酸奶</td></tr>
+        <tr><td>虾饼</td><td>信二嫂虾饼（振兴路店）</td><td>人均约 ¥12</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1（10/2）</td><td>湛江市区 霞山</td><td class="num">¥150–400/间</td><td>住霞山，近观海长廊和市场，晚上步行可达</td></tr>
+        <tr><td>D2（10/3）</td><td><b>硇洲岛</b></td><td class="num">¥217–400/间</td><td><b>最紧张的一晚</b>，岛小房源少，先订这个</td></tr>
+        <tr><td>D3（10/4）</td><td>湛江市区 霞山/赤坎</td><td class="num">¥150–400/间</td><td>赤坎老街附近更方便 D4 早上逛</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout danger" style="margin-bottom:0"><b>满房风险：</b>硇洲岛民宿在开渔季和节假日出现过订满的情况，国庆务必提前锁房。湛江市区房源多，压力小。5 人建议订 2 间（1 大床 + 1 双床）或 1 间家庭房 + 1 间标间。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">5 人、纯电、4 天 3 晚。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（5 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>过路费</b></td><td>国庆免费（平时约 ¥180 × 2）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td><b>电费</b></td><td>总里程约 990 km（往返 786 + 当地 200），约 158 kWh，高速快充 ¥1.2–1.8/kWh</td><td class="num">¥200–300</td><td class="num">¥40–60</td></tr>
+        <tr><td><b>硇洲岛车渡</b></td><td>小车 ¥78/辆 × 往返 + 乘客 ¥10/人 × 5 × 往返</td><td class="num">¥256</td><td class="num">¥51</td></tr>
+        <tr><td><b>住宿</b></td><td>2 间 × 3 晚（市区 ¥150–400、硇洲岛 ¥217–400）</td><td class="num">¥1,900–3,000</td><td class="num">¥380–600</td></tr>
+        <tr><td><b>餐饮</b></td><td>海鲜为主，人均 ¥150–200/天 × 4 天</td><td class="num">¥3,000–4,000</td><td class="num">¥600–800</td></tr>
+        <tr><td>门票</td><td>湖光岩 ¥50/人；硇洲灯塔、龙海天、赤坎老街免费</td><td class="num">¥250</td><td class="num">¥50</td></tr>
+        <tr><td>停车杂费</td><td>龙海天 ¥10/天、码头停车、市区停车</td><td class="num">¥150–250</td><td class="num">¥30–50</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥5,750–8,050</td><td class="num hi">约 ¥1,150–1,610</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>海鲜全部走"市场买 + 加工店"模式，不去景区排档</td><td class="num ok">比餐厅点菜省 40% 以上</td></tr>
+        <tr><td>砍掉湖光岩，改免费的海边和赤坎老街</td><td class="num ok">省 ¥250</td></tr>
+        <tr><td>住宿选市区经济型连锁（¥150–250）而非海景房</td><td class="num ok">省 ¥600–1,000</td></tr>
+        <tr><td>出发前在家充满电（¥0.6/kWh 谷电）而非全程快充</td><td class="num ok">省 ¥100–150</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">海鲜采购</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>称重前要求<b>沥干海水、去掉塑料袋和托盘</b></li>
+        <li>去市场入口的<b>公平秤复称</b>，这是最有效的一招</li>
+        <li>警惕低价引流 + 高额加工费套路</li>
+        <li>加工前拍照留底，确认加工费<b>包含杀洗</b>，否则可能另收</li>
+        <li>优先选证照齐全、明码标价的商户</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">轮渡与海岛</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>车渡受潮水影响会停航 2–4 小时，出发前查通航状态</li>
+        <li>节假日排队久，<b>人先上岛、车停东南码头</b>是稳妥选择</li>
+        <li>别把硇洲岛行程卡死在当天往返，住一晚更从容</li>
+        <li>硇洲岛只有 10 个充电桩，别指望岛上充电</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">电车与高速</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>单程 393 km 占满电续航 87%，<b>中途必须补一次</b></li>
+        <li>避开已列入"充电繁忙"名单的良西服务区</li>
+        <li>服务区排队超 30 分钟就下高速充，通常更快</li>
+        <li>充到 80% 就走，最后 20% 很慢</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">时间与天气</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>出程高峰 9/30–10/1，返程高峰 10/6–10/7，建议 10/2 走、10/5 回</li>
+        <li>高速免费到 10/7 24:00，返程别卡最后一晚</li>
+        <li>10 月上旬广东沿海仍有台风风险，直接影响轮渡通航</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  2026 国庆高速免费政策 · <a href="http://www.xinhuanet.com/20260924/c66b5a58f458494899252a81db68c166/c.html" target="_blank">新华网</a><br>
+  广东省交通运输厅双节出行与充电繁忙服务区 · <a href="https://td.gd.gov.cn/zwgk_n/jslyxxgk/aqyyj/content/mpost_4781561.html" target="_blank">td.gd.gov.cn</a><br>
+  硇洲岛车渡与节假日排队 · <a href="http://m.zhanjiang.bendibao.com/tour/22573.shtm" target="_blank">湛江本地宝</a><br>
+  硇洲岛车渡收费 · <a href="http://m.zhanjiang.bendibao.com/traffic/26340.shtm" target="_blank">湛江本地宝</a><br>
+  硇洲岛充电桩建设 · <a href="https://epaper.nfnews.com/m/ipaper/nfrb/html/202606/24/content_10173742.html" target="_blank">南方日报</a><br>
+  湛江市商务局餐饮名店名单 · <a href="https://www.zhanjiang.gov.cn/attachment/0/236/236804/1984349.pdf" target="_blank">zhanjiang.gov.cn</a><br>
+  湛江市消费者组织海鲜消费提示 · <a href="https://www.zhanjiang.gov.cn/zwgk/zwzt/cw/gj/content/mpost_2203927.html" target="_blank">zhanjiang.gov.cn</a><br>
+  湛江市海洋与渔业局 2026 年伏季休渔通告 · <a href="https://www.zhanjiang.gov.cn/zjsfw/bmdh/hyj/zwgk/tzgg/content/mpost_2174559.html" target="_blank">zhanjiang.gov.cn</a><br>
+  湖光岩门票 · <a href="https://zhanjiang.bendibao.com/tour/20251011/29567.shtm" target="_blank">湛江本地宝</a>
+  <p style="margin-top:14px">里程、价格、班次均为 2026 年 9 月 30 日检索口径，国庆期间浮动较大。<b>轮渡班次与充电桩实时状态请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→湛江', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1220,t:'transport',d:'满电出发，沈海高速G15'},
+    {n:'大槐服务区',city:'',lat:22.2900,lng:112.1900,t:'charge',d:'约86个充电车位，主选补电点'},
+    {n:'湛江霞山区',city:'湛江',lat:21.1950,lng:110.4000,t:'hotel',d:'入住，近观海长廊'},
+    {n:'霞山水产品批发市场',city:'湛江',lat:21.1930,lng:110.4060,t:'food',d:'胜利长堤4号，下午3-7时渔船回港'},
+    {n:'霞山观海长廊',city:'湛江',lat:21.2050,lng:110.4110,t:'spot',d:'看渔船、吹海风'},
+    {n:'金沙湾观海长廊',city:'湛江',lat:21.2530,lng:110.4060,t:'spot',d:'夜景'}
+  ]},
+  d2:{label:'D2 硇洲岛', color:'#af52de', pts:[
+    {n:'东南码头',city:'湛江',lat:20.9233,lng:110.5122,t:'transport',d:'车渡上岛，小车78元/辆，整点发船'},
+    {n:'硇洲镇 / 渔港',city:'硇洲岛',lat:20.9017,lng:110.5850,t:'hotel',d:'民宿入住 + 渔港鲜货'},
+    {n:'硇洲灯塔',city:'硇洲岛',lat:20.9017,lng:110.6067,t:'spot',d:'免费，含灯塔文化公园'},
+    {n:'那晏海石滩',city:'硇洲岛',lat:20.8906,lng:110.6164,t:'spot',d:'火山岩海岸，人少水清'}
+  ]},
+  d3:{label:'D3 东海岛→市区', color:'#34c759', pts:[
+    {n:'东南码头',city:'湛江',lat:20.9233,lng:110.5122,t:'transport',d:'取车，离岛'},
+    {n:'东海岛龙海天沙滩',city:'东海岛',lat:21.0049,lng:110.5355,t:'spot',d:'中国第一长滩，停车10元/天'},
+    {n:'湖光岩',city:'湛江',lat:21.1361,lng:110.2793,t:'spot',d:'世界地质公园，门票50元'},
+    {n:'湛江霞山/赤坎',city:'湛江',lat:21.2760,lng:110.3620,t:'hotel',d:'回市区入住，炭烤生蚝晚餐'}
+  ]},
+  d4:{label:'D4 市区→佛山', color:'#ff3b30', pts:[
+    {n:'赤坎老街',city:'湛江',lat:21.2760,lng:110.3620,t:'spot',d:'骑楼老街，免费'},
+    {n:'大槐服务区',city:'',lat:22.2900,lng:112.1900,t:'charge',d:'返程补电'},
+    {n:'佛山（返抵）',city:'佛山',lat:23.0218,lng:113.1220,t:'transport',d:'约19:00抵达'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🦐',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[21.9,111.5],zoom:7,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>

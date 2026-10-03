@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 郴州 · 4天3夜自驾方案（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 10/4–10/7 佛山出发 4天3夜自驾湘南郴州：东江湖雾漫小东江 + 高椅岭 + 莽山，含路线充电、逐日行程、美食与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线充电</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">吃在郴州</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 10/4 – 10/7 · 湘南郴州</div>
+  <h1>佛山 ⇄ 郴州 4 天 3 夜</h1>
+  <p>纯电自驾 · 东江湖雾漫小东江 · 高椅岭丹霞 · 莽山五指峰</p>
+  <div class="tags">
+    <span>单程约 400 km</span><span>纯电全程约 1,100 km</span>
+    <span>2 人 1 车</span><span>人均 ¥2,050–2,900</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>这一版怎么定的</h2>
+  <p class="sub">10/4–10/7 只有 4 天，而且<b>前两天下雨、后两天放晴</b>：所以雨天安排东江湖（烟雨更出片），晴天留给高椅岭和莽山。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>日期</th><th>天气</th><th>安排</th><th>住宿</th></tr></thead>
+      <tbody>
+        <tr><td><b>D1 · 10/4</b></td><td><span class="pill b">小雨 17–21℃</span></td><td>佛山 → 资兴东江湖（全程驾驶日）</td><td>东江湖景区</td></tr>
+        <tr><td><b>D2 · 10/5</b></td><td><span class="pill r">大雨 18–21℃</span></td><td>雾漫小东江 + 东江湖游湖 → 转郴州市区</td><td>郴州市区</td></tr>
+        <tr><td><b>D3 · 10/6</b></td><td><span class="pill g">晴 18–25℃</span></td><td>高椅岭丹霞 → 转场莽山，泡温泉</td><td>莽山</td></tr>
+        <tr><td><b>D4 · 10/7</b></td><td><span class="pill g">晴 15–25℃</span></td><td>莽山五指峰 → 返程佛山</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>三处关键取舍：</b>①<b>按天气排</b>——10/4、10/5 下雨，东江湖烟雨反而好看；10/6、10/7 放晴，把要爬山、要出片的高椅岭和莽山放这两天。②<b>莽山收尾</b>——莽山在宜章、紧挨广东，放最后一天，返程只需约 360 km，比从资兴直接回佛山少绕一大截。③<b>砍掉仰天湖</b>——它在市区西北，和本线方向相反，硬加会多出 5 小时山路往返，留给下次。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">路线设计</div>
+      <div class="v">一路向北再南归</div>
+      <div class="d">佛山 → 资兴 → 郴州 → 莽山 → 佛山。莽山在返程方向，最后一天少开约 100 km，不走回头路。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">天气窗口</div>
+      <div class="v">前雨后晴</div>
+      <div class="d">10/4 小雨、10/5 大雨、10/6–7 晴。雨天看东江湖，晴天走高椅岭与莽山，节奏刚好错开。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">必须预约</div>
+      <div class="v">无预约不入园</div>
+      <div class="d">东江湖、莽山、高椅岭等五大热门景区国庆实行实名预约、分时段入园，今天就约。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">核心约束</div>
+      <div class="v">观雾 5:30</div>
+      <div class="d">雾漫小东江只在清晨 5:30–8:30 出现，必须前一晚住资兴，起早才看得到。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。前四项是硬门槛——尤其景区预约，国庆没预约真的进不去。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约东江湖景区（10/5）</div><div class="m">国庆"线上实名预约、分时段入园，无预约不入园"。渠道：东江湖官网 dongjianghu.com 或官方公众号；建议约上午场，赶得上观雾后的游湖。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约莽山（10/7）</div><div class="m">渠道：微信小程序"莽山旅游区"。国庆自驾禁入园，车停景区外停车场、换乘景区车；套票含索道，务必一并预约。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约高椅岭（10/6）</div><div class="m">同样需线上实名预约。开放 07:00–19:00，17:20 停止入园；全程步行、台阶陡，穿防滑鞋。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订东江湖住宿（D1，资兴）</div><div class="m">看晨雾必须住景区附近。<b>国庆是全程最紧张的一晚</b>，一线江景房溢价明显，越早越好。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订郴州市区酒店（D2）与莽山住宿（D3）</div><div class="m">市区选五岭广场/裕后街一带，中端连锁 ¥260–450；莽山可住山脚温泉酒店，泡汤收尾。</div></div><span class="due p1">尽快</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">规划纯电补能</div><div class="m">去程在<b>许广高速清新服务区</b>（双向 46 桩）或道林/常宁补一次，郴州/耒阳再补一次；进莽山前在<b>宜章县城或高速宜章服务区充满</b>。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备雨具与防滑鞋</div><div class="m">10/4–10/5 有雨，栈道湿滑；莽山、仰天湖海拔高，早晚比市区低 5–8℃，带薄外套。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">错峰返程（10/7）</div><div class="m">国庆返程高峰在 15:00–21:00，尽量 13:00 前上高速主路；高速免费以<b>驶离收费站时间</b>为准。</div></div><span class="due p2">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线与充电</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>去程</td><td>佛山 → 许广/京港澳高速北上 → <b>资兴东江湖</b>，约 430 km</td></tr>
+        <tr><td>转场</td><td>资兴 → 郴州市区 → 高椅岭 → <b>莽山</b></td></tr>
+        <tr><td>返程</td><td>莽山 → 佛山，约 360 km（莽山紧邻广东，返程顺路）</td></tr>
+        <tr><td>全程里程</td><td class="num">约 1,100 km（往返 + 当地）</td></tr>
+        <tr><td>过路费</td><td><b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下），全程落在免费窗口内</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>纯电补能点</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>路段</th><th>推荐补能点</th><th>桩况</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>广东段</td><td><b>许广高速 清新服务区</b></td><td class="num">双向共 46 个充电桩</td><td><span class="pill g">首选</span> 出省前补一次</td></tr>
+        <tr><td>广东段</td><td>道林 / 常宁服务区</td><td class="num">节假日保畅重点</td><td><span class="pill o">备选</span> 清新排队时用</td></tr>
+        <tr><td>湖南段</td><td><b>耒阳 / 永兴 / 郴州 / 苏仙 / 宜章</b></td><td class="num">5 站共 92 根枪，单侧 16–20 根</td><td><span class="pill g">首选</span> 进入郴州前后补一次</td></tr>
+        <tr><td>湖南段</td><td>欧阳海服务区</td><td class="num">20 根枪 + 换电站（约 3 分钟）</td><td><span class="pill b">换电</span> 支持换电车型可考虑</td></tr>
+        <tr><td>景区</td><td>东江湖景区停车场 / 游客中心</td><td class="num">约 32 台公共桩，含 899 个生态车位</td><td><span class="pill o">偏紧</span> 晚上回民宿前补</td></tr>
+        <tr><td>景区</td><td>莽山周边</td><td class="num">公开桩信息不足</td><td><span class="pill r">注意</span> 务必在宜章县城/宜章服务区充满再进山</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>纯电节奏建议：</b>出发前满电（约 400–500 km 续航车型），到清新服务区补到 80% 以上；进入湖南后在郴州/耒阳再补一次即可抵达资兴。全程约 1,100 km，按高速快充 ¥1.5–2/kWh、电耗 15 kWh/100km 估算，电费约 ¥350–480。<b>国庆服务区充电排队是最大不确定项</b>，建议每次补到 80% 就走，别等充满。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天驾驶、一天东江湖、一天高椅岭+莽山、一天莽山+返程。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">4</div></div>
+      <div><h4>佛山 → 资兴东江湖</h4><div class="meta">10 月 4 日 · 小雨 · 全程驾驶日，约 430 km / 5.5h</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:00</div><div class="tx"><b>佛山出发</b><small>赶在出城高峰前上高速；走许广 / 京港澳北上</small></div></div>
+        <div class="row c"><div class="tm">09:30</div><div class="tx"><b>清新服务区补电</b><small>许广高速，双向 46 桩；补到 80% 即可，别等充满</small></div></div>
+        <div class="row"><div class="tm">12:00</div><div class="tx"><b>服务区简餐</b><small>自带干粮或服务区解决，减少途中停留</small></div></div>
+        <div class="row c"><div class="tm">14:00</div><div class="tx"><b>郴州 / 耒阳服务区二次补电</b><small>视电量决定；雨天路滑，注意车距</small></div></div>
+        <div class="row h"><div class="tm">15:30</div><div class="tx"><b>抵资兴，入住东江湖景区附近</b><small>看晨雾必须住这里；江景房溢价明显</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>白廊环湖</b><small><span class="pill g">免费</span> 小雨里看东江湖，环湖公路好走</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：东江鱼</b><small>清蒸或剁椒，东江湖特色水产</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>D1 就一件事：安全到位。</b>雨天高速 + 纯电补能，全程按 6 小时预留。当天不安排硬景点，把体力留给第二天的晨雾。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">5</div></div>
+      <div><h4>雾漫小东江 + 东江湖 → 郴州市区</h4><div class="meta">10 月 5 日 · 大雨 · 全程最精华的一天</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">05:30</div><div class="tx"><b>起床，前往 2 号桥观雾栈道</b><small>观雾窗口 5:30–8:30；2 号桥是栈道起点，3 号桥竹林岛视野集中</small></div></div>
+        <div class="row f"><div class="tm">06:00</div><div class="tx"><b>雾漫小东江</b><small>雨天湿度大，雾可能更浓更"仙"；栈道湿滑，注意脚下</small></div></div>
+        <div class="row"><div class="tm">08:30</div><div class="tx"><b>早餐：栖凤渡鱼粉</b><small>红油鲜辣，郴州代表早餐</small></div></div>
+        <div class="row f"><div class="tm">09:30</div><div class="tx"><b>东江湖游客中心，游湖线</b><small>含车 + 船票；游东江大坝、兜率岛、龙景峡谷，烟雨东江最有味道</small></div></div>
+        <div class="row"><div class="tm">12:30</div><div class="tx"><b>午餐：东江三文鱼 / 湖鲜</b><small>景区或资兴市区解决</small></div></div>
+        <div class="row t"><div class="tm">14:00</div><div class="tx"><b>转场郴州市区</b><small>约 50 km / 1 小时</small></div></div>
+        <div class="row h"><div class="tm">15:30</div><div class="tx"><b>入住市区（五岭广场 / 裕后街）</b><small>先补电，再安顿</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>裕后街 / 郴州长卷</b><small>以室内与骑楼为主，正好避雨</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：临武鸭 + 烧鸡公</b><small>郴州经典辣味，人均约 ¥60–100</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>观雾是这一天的核心，但要看运气：</b>10 月雾不如 6–8 月浓，若 10/5 大雨导致雾况差，别恋战——游湖线本身在雨天也很出片。<b>注意：观湖线 ¥85（含车）、游湖线 ¥185（含车+船），按需选；白廊环湖免费。</b></div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff9500"><div class="d">D3</div><div class="n">6</div></div>
+      <div><h4>高椅岭 → 莽山</h4><div class="meta">10 月 6 日 · 晴 · 上午丹霞，下午转场泡温泉</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:30</div><div class="tx"><b>市区出发 → 高椅岭</b><small>约 30 km，07:00 开园，早到人少、光线好</small></div></div>
+        <div class="row f"><div class="tm">08:00</div><div class="tx"><b>高椅岭丹霞</b><small>门票 ¥95；全程步行、台阶陡，穿防滑鞋，晴天最出片</small></div></div>
+        <div class="row"><div class="tm">11:30</div><div class="tx"><b>午餐</b><small>高椅岭周边或回市区方向解决</small></div></div>
+        <div class="row t"><div class="tm">13:00</div><div class="tx"><b>高椅岭 → 莽山</b><small>约 130 km，2.5–3 小时（含进山路段）</small></div></div>
+        <div class="row c"><div class="tm">16:00</div><div class="tx"><b>抵莽山，入住山脚温泉酒店</b><small>进山前在宜章县城/宜章服务区把电充满</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>泡温泉 / 猴王寨轻徒步</b><small>猴王寨 3000 米峡谷 + 700 米栈道，往返约 1 小时</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>晚餐 + 早休息</b><small>第二天要上五指峰</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>为什么把高椅岭放上午：</b>它全是露天台阶、没有遮阴，晴天上午光线和体感都最好；下午转场到莽山正好赶上泡温泉。<b>若高椅岭预约不到，可换成市区的苏仙岭（免费，索道 ¥60）或飞天山翠江（约 ¥69）。</b></div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D4</div><div class="n">7</div></div>
+      <div><h4>莽山五指峰 → 返程佛山</h4><div class="meta">10 月 7 日 · 晴 · 上午登顶，下午返程</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:00</div><div class="tx"><b>莽山五指峰</b><small>套票含往返索道 + 观光车；国庆自驾禁入园，车停景区外换乘景区车</small></div></div>
+        <div class="row f"><div class="tm">09:00</div><div class="tx"><b>天台山 / 云梯</b><small>自动扶梯 ¥43/次；晴天云海与群峰视野最好</small></div></div>
+        <div class="row"><div class="tm">12:00</div><div class="tx"><b>午餐</b><small>景区或莽山镇解决</small></div></div>
+        <div class="row t"><div class="tm">13:30</div><div class="tx"><b>莽山 → 佛山</b><small>约 360 km，4.5 小时；莽山紧邻广东，返程顺路</small></div></div>
+        <div class="row"><div class="tm">18:00</div><div class="tx"><b>抵佛山</b><small>避开 15:00 后返程高峰，13:00 前上高速最稳</small></div></div>
+      </div>
+      <div class="callout danger" style="margin-bottom:0"><b>D4 要卡时间：</b>五指峰索道 + 观光车 + 登顶至少 4 小时，<b>务必 07:00 就到景区换乘</b>；返程 360 km、4.5 小时，若当天天气好、想多玩，可把出发时间提到 12:30，或接受 20:00 后到家。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>可选替换（想换口味时）：</b>把 D3 下午的莽山换成<b>仰天湖大草原</b>（北湖区，海拔 1314 m，门票 ¥120，9/15–10/15 有南瓜节）——但它在市区西北、与本线方向相反，往返约 5 小时山路，会明显挤压时间，只在你不去莽山时才建议。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>吃在郴州</h2>
+  <p class="sub">郴州口味鲜辣，市区集中，资兴以湖鲜为主。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>地点</th><th>必吃</th><th>参考人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>资兴 / 东江湖</b></td><td>东江鱼（清蒸/剁椒）、东江三文鱼、湖鲜</td><td class="num">¥60–100</td></tr>
+        <tr><td><b>郴州市区</b></td><td>栖凤渡鱼粉、临武鸭、烧鸡公、桂阳坛子肉、米粉鹅</td><td class="num">¥50–90</td></tr>
+        <tr><td><b>莽山 / 宜章</b></td><td>山区农家菜、腊味、土鸡；选择少于市区</td><td class="num">¥60–100</td></tr>
+        <tr><td>返程途中</td><td>永兴冰糖橙（10 月正上市，可带一箱）</td><td class="num">按斤计</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">具体单店口碑本次未逐一核验，建议到店看本地人流量选择；景区内（东江湖码头、莽山山上）餐饮溢价明显，正餐尽量安排在资兴市区或郴州市区。</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1（10/4）</td><td>资兴 · 东江湖景区</td><td class="num">约 ¥800–1,500/间</td><td><b>全程最紧、最贵</b>，看晨雾必须住这里，国庆涨幅可达 50%–100%</td></tr>
+        <tr><td>D2（10/5）</td><td>郴州市区 · 五岭广场 / 裕后街</td><td class="num">约 ¥260–450/间</td><td>选择多、性价比高，夜游裕后街方便</td></tr>
+        <tr><td>D3（10/6）</td><td>莽山 · 山脚温泉酒店</td><td class="num">约 ¥700–1,300/间</td><td>部分套餐含温泉/门票；国庆房源中等偏紧</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>预订提示：</b>东江湖看雾区的房源是全趟最紧张的，<b>优先订它</b>；订不到一线江景就退一步选资兴市区（开车到观雾栈道约 20–30 分钟，代价是要更早起）。莽山若想省钱，可住宜章县城（约 ¥200–350），每天进山。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">2 人 1 车、纯电、4 天 3 夜。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（2 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>充电</b></td><td>全程约 1,100 km，高速快充 ¥1.5–2/kWh、电耗约 15 kWh/100km</td><td class="num">¥350–480</td><td class="num">¥175–240</td></tr>
+        <tr><td>过路费</td><td>国庆免费（10/1–10/7，7 座及以下）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td><b>住宿</b></td><td>1 间 × 3 晚（东江湖 1 晚最贵 + 市区 1 晚 + 莽山 1 晚）</td><td class="num">¥1,760–3,250</td><td class="num">¥880–1,625</td></tr>
+        <tr><td>餐饮</td><td>2 人 × 4 天 × ¥120–180/人/天</td><td class="num">¥960–1,440</td><td class="num">¥480–720</td></tr>
+        <tr><td>门票</td><td>东江湖游湖线 ¥185 + 高椅岭 ¥95 + 莽山套票 ¥338 ≈ ¥618/人</td><td class="num">¥1,236</td><td class="num">¥618</td></tr>
+        <tr><td>停车杂费</td><td>景区停车、莽山景交、观光车等</td><td class="num">¥150–250</td><td class="num">¥75–125</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥4,450–6,650</td><td class="num hi">约 ¥2,225–3,325</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>最大的一项是住宿：</b>东江湖 1 晚就可能顶上市区 3 晚。这也是国庆去郴州的代价——想住得舒服，钱基本花在江景房和温泉上。2 人出行的优势是过路费全免、充电便宜，人均能压到 ¥2,200 左右。
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>东江湖改住资兴市区（非一线江景）</td><td class="num ok">省 ¥300–600</td></tr>
+        <tr><td>莽山不住温泉酒店，住宜章县城</td><td class="num ok">省 ¥400–800</td></tr>
+        <tr><td>东江湖门票用观湖线 ¥85 替代游湖线 ¥185</td><td class="num ok">省 ¥200（2 人）</td></tr>
+        <tr><td>充电补到 80% 就走、避开高价桩</td><td class="num ok">省 ¥50–100</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">预约与限流</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>东江湖、莽山、高椅岭、仰天湖、飞天山翠江<b>五大景区"无预约、不入园"</b></li>
+        <li>建议<b>提前 1–3 天</b>在官方平台实名预约、分时段入园</li>
+        <li>东江湖：dongjianghu.com / 官方公众号；莽山：微信小程序"莽山旅游区"</li>
+        <li>莽山每日最佳承载约 13000 人，约满即止</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">天气与穿着</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/4 小雨、10/5 <b>大雨</b>——栈道湿滑，防滑鞋必备</li>
+        <li>10/6–7 放晴，适合高椅岭、莽山户外</li>
+        <li>莽山、仰天湖海拔高，早晚比市区低 5–8℃，带薄外套</li>
+        <li>山区多雾，早晚能见度低，注意行车</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">纯电补能</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>莽山周边公开充电桩信息不足，<b>务必在宜章充满再进山</b></li>
+        <li>国庆服务区充电易排队，补到 80% 就走</li>
+        <li>推荐：清新服务区（46 桩）、郴州/耒阳/宜章服务区</li>
+        <li>东江湖景区约 32 台公共桩，晚上回民宿前补</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">时间与路况</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>观雾只在清晨 <b>5:30–8:30</b>，必须前一晚住资兴</li>
+        <li>高椅岭 17:20 停止入园，全程步行、台阶陡</li>
+        <li>莽山国庆禁自驾入园，停外场换乘景区车</li>
+        <li>返程 10/7 避开 15:00–21:00 高峰，13:00 前上高速</li>
+        <li>高速免费以<b>驶离收费站时间</b>为准，别卡 24:00 边界</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  湖南文旅厅 · 东江湖票价批复 · <a href="https://whhlyt.hunan.gov.cn/whhlyt/xxgk2019/xxgkml/tzgg/202604/33968745/files/3a0917736a2746d5a6082849600dc64b.pdf" target="_blank">hunan.gov.cn</a><br>
+  资兴市政府 · 小东江观雾与白廊 · <a href="http://www.zixing.gov.cn/yxly/lyxl/content_3263824.html" target="_blank">zixing.gov.cn</a><br>
+  郴州五大景区预约限流 · <a href="https://m.voc.com.cn/xhn/news/202610/33895959.html" target="_blank">华声在线</a><br>
+  莽山门票与国庆限流 · <a href="https://m.voc.com.cn/xhn/news/202608/33515115.html" target="_blank">华声在线</a><br>
+  湖南高速服务区充电桩 · <a href="https://m.voc.com.cn/xhn/news/202602/31538615.html" target="_blank">华声在线</a><br>
+  2026 国庆高速免费政策 · <a href="http://society.people.com.cn/n1/2026/0924/c1008-40805156.html" target="_blank">人民网</a><br>
+  郴州景点间里程 · <a href="https://www.czs.gov.cn/html/czlyy/jtfw/content_798372.html" target="_blank">郴州市政府</a><br>
+  郴州 10 月天气 · <a href="https://tianqi.eastday.com/chenzhou/15/" target="_blank">东方天气</a>
+  <p style="margin-top:14px">里程、票价、班次、限流规则均为 2026 年 10 月 3 日检索口径，国庆期间浮动较大。<b>景区预约名额、租车/充电桩实时状态请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→资兴', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'07:00 出发，走许广/京港澳北上'},
+    {n:'许广高速清新服务区',city:'清远',lat:23.7300,lng:113.0200,t:'charge',d:'双向 46 桩，补到 80%'},
+    {n:'京港澳郴州服务区',city:'郴州',lat:25.8000,lng:113.0300,t:'charge',d:'视电量二次补电'},
+    {n:'资兴·东江湖',city:'资兴',lat:25.9550,lng:113.2750,t:'hotel',d:'约 15:30 抵达，宿景区'}
+  ]},
+  d2:{label:'D2 小东江→郴州市区', color:'#af52de', pts:[
+    {n:'小东江观雾栈道（2 号桥）',city:'资兴',lat:25.9600,lng:113.2650,t:'spot',d:'05:30–08:30 观雾窗口'},
+    {n:'东江湖游客中心 / 大坝',city:'资兴',lat:25.9550,lng:113.2750,t:'spot',d:'游湖线含车+船，游兜率岛'},
+    {n:'兜率岛',city:'资兴',lat:25.9000,lng:113.3300,t:'spot',d:'东江湖中，坐船前往'},
+    {n:'郴州市区·裕后街',city:'郴州',lat:25.7800,lng:113.0300,t:'hotel',d:'约 50 km / 1h，夜游裕后街'}
+  ]},
+  d3:{label:'D3 高椅岭→莽山', color:'#ff9500', pts:[
+    {n:'高椅岭',city:'郴州',lat:25.8300,lng:113.2400,t:'spot',d:'丹霞，门票 ¥95，晴天最出片'},
+    {n:'莽山镇（山脚）',city:'宜章',lat:25.0500,lng:112.9000,t:'hotel',d:'约 130 km，宿温泉酒店'},
+    {n:'莽山温泉',city:'宜章',lat:25.0500,lng:112.9000,t:'hotel',d:'泡汤收尾'}
+  ]},
+  d4:{label:'D4 莽山→佛山', color:'#34c759', pts:[
+    {n:'莽山五指峰',city:'宜章',lat:25.0200,lng:112.8700,t:'spot',d:'套票含索道+观光车，07:00 换乘'},
+    {n:'高速宜章服务区',city:'宜章',lat:25.4000,lng:112.9500,t:'charge',d:'进山前/返程补能'},
+    {n:'佛山',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'约 360 km / 4.5h 返抵'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[24.6,113.0],zoom:7,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>

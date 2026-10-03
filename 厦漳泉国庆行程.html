@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国庆 广州 ⇄ 厦漳泉 · 5天4晚行程方案</title>
+<meta name="description" content="2026年10月3日-7日 广州往返厦门·漳州·泉州 高铁行程规划，含可行性核验与费用评估">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── top nav ── */
+.nav{
+  position:sticky;top:0;z-index:900;
+  background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid var(--line);
+  display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);
+  padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s;
+}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 18px 80px}
+
+/* ── hero ── */
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0 10px}
+.hero p{font-size:16px;color:var(--ink2);max-width:620px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+/* ── sections ── */
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{
+  width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;
+  font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;
+}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+/* ── cards ── */
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* ── callout ── */
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+.callout b{font-weight:700}
+
+/* ── todo list ── */
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+/* ── map ── */
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:440px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{
+  font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;
+  background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit;
+}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+/* ── day block ── */
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{
+  flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1;
+}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.h::before{background:var(--orange)}
+.tl .tm{flex-shrink:0;width:62px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx b{font-weight:700}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+/* ── tables ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+/* ── pill ── */
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+/* ── cut list ── */
+.cut{display:grid;gap:10px}
+.cut .c{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);border-left:3px solid var(--ink3)}
+.cut .c .t{font-weight:700;font-size:15px;margin-bottom:3px}
+.cut .c .d{font-size:13.5px;color:var(--ink2)}
+
+/* ── footer ── */
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:52px;font-size:11.5px}
+  #map{height:340px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">地图</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">餐饮</a>
+  <a href="#s5">交通</a>
+  <a href="#s6">住宿</a>
+  <a href="#s7">预算</a>
+  <a href="#s8">砍掉了什么</a>
+  <a href="#s9">避雷</a>
+  <a href="#s10">天气备案</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 闽南三城</div>
+  <h1>广州 ⇄ 厦漳泉 5 天 4 晚</h1>
+  <p>10 月 3 日 – 10 月 7 日 · 高铁往返 · 3–4 人 · 不租车</p>
+  <div class="tags">
+    <span>漳州 1 天</span><span>厦门 2 天</span><span>泉州 1.5 天</span>
+    <span>全程不折返</span><span>人均 ¥2,480–3,070</span>
+  </div>
+</div>
+
+<!-- ══════════ 0 结论 ══════════ -->
+<section id="s0">
+  <h2><span class="n">0</span>结论先行</h2>
+  <p class="sub">这次把动线从「折返」改成「单向推进」，真正的风险仍然在票。</p>
+
+  <div class="grid4">
+    <div class="kpi red">
+      <div class="k">最大风险</div>
+      <div class="v">高铁票</div>
+      <div class="d">预售期 15 天，10/3 车票 9/19 已开售、10/7 车票 9/23 已开售。二等座大概率无票，<b>现在只能候补</b>。</div>
+    </div>
+    <div class="kpi">
+      <div class="k">路线设计</div>
+      <div class="v">漳 → 厦 → 泉</div>
+      <div class="d">漳州在厦门<b>西边</b>、泉州在厦门<b>东北</b>。按「漳州→厦门→泉州」自西南向东北推进，全程不折返。</div>
+    </div>
+    <div class="kpi green">
+      <div class="k">当地交通</div>
+      <div class="v">不租车</div>
+      <div class="d">厦门站在岛内，到中山路仅 15–20 分钟；泉州古城、漳州古城全程步行。租车反成负担。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">预估费用</div>
+      <div class="v">¥2,480–3,070</div>
+      <div class="d">人均（4 人同行）。4 人合计约 <b>0.99–1.23 万元</b>。大头是大交通与住宿。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>这次改了什么：</b>原来的顺序是「广州→厦门→漳州→泉州」，等于从厦门往西退回漳州，再往东折回泉州，<b>厦门北—漳州这一段来回坐了两遍</b>。改成「广州→漳州→厦门→泉州」后，城市顺序与地理顺序一致，全程只往东北走，不走回头路，漳州也从原来的半天变成完整一天。
+  </div>
+  <div class="callout danger">
+    <b>必须在出发前 48 小时内解决的事：</b>10/3 去程与 10/7 返程的高铁候补。若两程都抢不到，整个行程需要重排（改飞机 / 改日期 / 改路线）。
+  </div>
+  <div class="callout warn">
+    <b>改顺序的一个代价，先说清楚：</b>鼓浪屿从 10/4 挪到了 10/5。已知预报显示厦门 10/4–10/5 两天都有小到中雨，所以影响有限，但如果你特别在意鼓浪屿的天气，可以把它和 10/4 的厦门市区日对调（船票要按新日期重抢）。
+  </div>
+  <div class="callout ok">
+    <b>一个好消息：</b>泉州世遗点绝大多数免费 —— 开元寺、清净寺、天后宫、洛阳桥、关岳庙、府文庙都不收门票，只有清源山收 59 元。这是全国性价比最高的世遗城市之一。
+  </div>
+</section>
+
+<!-- ══════════ 1 待办 ══════════ -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办清单</h2>
+  <p class="sub">按紧急度排序，点一下可以勾掉。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">12306 候补 · 去程 10/3 广州南 → 漳州</div><div class="m">首选直达：G1023（09:13→12:20，3h07m，¥283.5）、G3741（12:42→16:07）、G1626（10:04→13:44），<b>每天约 12 趟</b>。挂满 6 个候补订单，每单 3 个日期、合计不超过 60 个车次。</div></div><span class="due p0">立刻</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">去程备选 · 买「广州南 → 厦门北」在漳州提前下车</div><div class="m">漳州方向直达车次较少（约 12 趟/天），是全程最可能抢不到的一段。厦深线列车<b>先到漳州、再到厦门北</b>，所以可以直接买广州南→厦门北（约 38 趟/天，¥308.5）的车票，在漳州站提前下车，<b>多花约 ¥25，但不用折返</b>。</div></div><span class="due p0">立刻</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">12306 候补 · 返程 10/7 泉州 → 广州</div><div class="m">直达 G3051（泉州东 18:55 → 广州东 23:11，¥453）＋ 备选「泉州→厦门北」＋「厦门北→广州南」两段一起挂。</div></div><span class="due p0">立刻</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">抢鼓浪屿船票（10/5）</div><div class="m">「屿见厦门」微信小程序 / 支付宝，<b>每日 9:00 开售第 15 天的票</b>，往返 ¥35/人。无现场票，只能线上抢。<b>注意日期是 10/5，不是 10/4。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订酒店（漳州 1 晚 + 厦门 2 晚 + 泉州 1 晚）</div><div class="m">国庆热门片区提前 2–3 周就锁房，现在属于高价捡漏阶段。漳州古城周边经济型连锁约 ¥275 起，房源比厦门宽松；<b>厦门岛内 10/4–10/6 两晚最紧</b>。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">厦门大学预约</div><div class="m">「厦门大学访客预约系统」公众号，实名预约。法定节假日名额约 1 万人/天。<b>不接受旅行社、中介团体预约。</b></div></div><span class="due p1">10/1 起盯放号</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">南普陀寺预约</div><div class="m">「南普陀寺预约服务平台」小程序，实名分时入寺，免费。开放 08:00–18:00。</div></div><span class="due p1">10/3 前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">提线木偶戏 / 南音演出票</div><div class="m">木偶戏 ¥30/50/80，泉州市木偶剧团微信小程序购票；南音《南音"偶"遇》10/3–10/6 在泉州南音艺苑演出，¥109/129。<b>泉州安排在 10/6，演出当天到泉州就能买。</b></div></div><span class="due p2">10/6 前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">蟳埔村簪花围预约</div><div class="m">全村统一 ¥40/人（含服饰），含化妆约 ¥80。国庆热门拍照点要排队，建议提前 1–2 天在美团/小红书预约。<b>安排在 10/6 傍晚。</b></div></div><span class="due p2">10/5 前</span></label>
+  </div>
+
+  <div class="callout warn">
+    <b>不要踩的坑：</b>厦门有<b>两个站</b>。厦门北站在岛外集美区，进岛要 40–50 分钟地铁；厦门站在<b>岛内思明区</b>，到中山路只有 15–20 分钟。去程从漳州进厦门，<b>优先买「漳州 → 厦门站」的车次</b>，买不到再坐「漳州 → 厦门北」转地铁 1 号线进岛。去泉州同理，<b>从厦门站出发比从厦门北出发省近 40 分钟</b>。
+  </div>
+</section>
+
+<!-- ══════════ 2 地图 ══════════ -->
+<section id="s2">
+  <h2><span class="n">2</span>交互地图</h2>
+  <p class="sub">切换天数查看当天动线，点击标记可直接唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+</section>
+
+<!-- ══════════ 3 逐日行程 ══════════ -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天一个主区域，一天最多一个需要预约的点。宁可少去一个点，也不排成赶场。</p>
+
+  <!-- D1 -->
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">3</div></div>
+      <div><h4>广州 → 漳州</h4><div class="meta">10 月 3 日 周六 · 主区域：漳州古城（全程步行）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">09:13</div><div class="tx"><b>广州南 → 漳州 G1023</b><small>3 小时 07 分，二等座 ¥283.5。备选 G1626（10:04→13:44）、G3741（12:42→16:07）</small></div></div>
+        <div class="row t"><div class="tm">12:20</div><div class="tx"><b>漳州站 → 漳州古城</b><small>约 11 公里，打车 20 分钟 ¥19–20/车；也可坐 B1 路公交</small></div></div>
+        <div class="row h"><div class="tm">14:00</div><div class="tx"><b>入住 / 寄存行李</b><small>漳州古城周边。只住一晚，明天上午就走</small></div></div>
+        <div class="row"><div class="tm">15:00</div><div class="tx"><b>漳州古城：香港路骑楼 → 漳州文庙 → 台湾路 → 中山公园</b><small>古城核心区全程步行，骑楼有遮挡，雨天影响不大</small></div></div>
+        <div class="row f"><div class="tm">18:00</div><div class="tx"><b>晚餐：阿芬卤面 / 洋老州卤面</b><small>再配天宝洪坑手抓面，人均约 ¥30</small></div></div>
+        <div class="row"><div class="tm">19:30</div><div class="tx"><b>古城夜景 + 原公园后门四果汤</b><small>青年路一带</small></div></div>
+      </div>
+      <div class="callout info"><b>为什么第一天这么轻：</b>刚到，行李在手，状态最差。漳州古城体量不大、核心区步行能绕完，正好用来过渡。这也是改顺序后多出来的半天 —— 原来漳州只有半天，还夹在两次赶车中间。</div>
+      <div class="callout warn" style="margin-bottom:0"><b>体力还有富余：</b>可加<b>云洞岩</b>（约 ¥20，古城东北约 8 公里）。但它是爬山，别硬塞，第二天上午还要赶车。</div>
+    </div>
+  </div>
+
+  <!-- D2 -->
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">4</div></div>
+      <div><h4>漳州 → 厦门</h4><div class="meta">10 月 4 日 周日 · 主区域：厦大 / 沙坡尾 / 中山路</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>早餐：漳州古城</b><small>面煎粿 + 豆花粉丝，古城内解决</small></div></div>
+        <div class="row t"><div class="tm">09:00</div><div class="tx"><b>退房 → 漳州站</b><small>约 11 公里，打车 20 分钟 ¥19–20/车</small></div></div>
+        <div class="row t"><div class="tm">09:40</div><div class="tx"><b>漳州 → 厦门</b><small>动车 30–37 分钟，二等座 ¥21。班次密，随到随走</small></div></div>
+        <div class="row h"><div class="tm">10:40</div><div class="tx"><b>厦门站 → 酒店寄存行李</b><small>厦门站在<b>岛内思明区</b>，到中山路仅 15–20 分钟</small></div></div>
+        <div class="row"><div class="tm">11:30</div><div class="tx"><b>厦门大学 → 南普陀寺</b><small>厦大需公众号预约进校；南普陀免费但需实名预约（08:00–18:00）</small></div></div>
+        <div class="row f"><div class="tm">13:00</div><div class="tx"><b>午餐：厦大西村 / 沙坡尾</b><small>四里沙茶面，加料后约 ¥20</small></div></div>
+        <div class="row"><div class="tm">14:30</div><div class="tx"><b>沙坡尾避风坞 → 白城沙滩 → 演武大桥观景台</b><small>都在厦大西南侧一条线上，步行 + 短打车</small></div></div>
+        <div class="row f"><div class="tm">18:00</div><div class="tx"><b>晚餐：开元路 141 大排档</b><small>酱油水海鲜，比网红海鲜排档实在</small></div></div>
+        <div class="row"><div class="tm">20:00</div><div class="tx"><b>中山路骑楼夜景 + 局口街小吃</b><small>莲欢海蛎煎、天河西门土笋冻</small></div></div>
+      </div>
+      <div class="callout info"><b>为什么这天这样排：</b>上午从漳州过来只要 30 多分钟，到厦门正好接上厦大 / 南普陀的下午时段。演武大桥观景台是看日落和夜景的位置，排在晚饭前后刚好。<b>漳州 → 厦门 → 泉州是厦深线的实际走向</b>，这段动车顺向，不折返。</div>
+      <div class="callout warn" style="margin-bottom:0"><b>天气敏感：</b>预报显示 10 月 4–5 日厦门有小到中雨。环岛路、白城沙滩是纯户外，雨天改成中山路骑楼（有遮挡）+ 八市 + 厦门博物馆。</div>
+    </div>
+  </div>
+
+  <!-- D3 -->
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff9500"><div class="d">D3</div><div class="n">5</div></div>
+      <div><h4>鼓浪屿一日</h4><div class="meta">10 月 5 日 周一 · 主区域：鼓浪屿（全程步行）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>早餐</b><small>思北花生汤（¥8）或 佳味再添小吃店（07:00–21:00）</small></div></div>
+        <div class="row t"><div class="tm">08:30</div><div class="tx"><b>邮轮中心厦鼓码头 → 三丘田码头</b><small>船票 ¥35/人往返，已提前抢好 10/5 的票</small></div></div>
+        <div class="row"><div class="tm">09:00</div><div class="tx"><b>鼓浪屿：日光岩 → 菽庄花园（钢琴博物馆）→ 龙头路小吃</b><small>岛上停留约 5 小时</small></div></div>
+        <div class="row t"><div class="tm">14:30</div><div class="tx"><b>返程回厦门岛</b></div></div>
+        <div class="row"><div class="tm">15:30</div><div class="tx"><b>八市（第八市场）→ 中山路</b><small>朱记手撕鸡、阿杰五香，边走边吃</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：八市周边大排档</b></div></div>
+        <div class="row"><div class="tm">20:00</div><div class="tx"><b>环岛路 / 曾厝垵夜景</b><small>体力够再去，不够就回酒店收拾行李</small></div></div>
+      </div>
+      <div class="callout warn"><b>天气敏感：</b>预报显示 10 月 4–5 日厦门有小到中雨。鼓浪屿全程户外步行，雨天体验打折。<br>雨备选：菽庄花园钢琴博物馆、风琴博物馆、鼓浪屿音乐厅。船票按日期买，改期等于重新抢票，基本只能带雨衣硬上 —— <b>雨衣在码头买，别在岛上买</b>。</div>
+      <div class="callout danger" style="margin-bottom:0"><b>岛上消费：</b>鼓浪屿餐饮和海鲜价格显著高于岛内。<b>正餐不要在岛上吃</b>，吃小吃垫一下，回岛内吃晚饭。</div>
+    </div>
+  </div>
+
+  <!-- D4 -->
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D4</div><div class="n">6</div></div>
+      <div><h4>厦门 → 泉州</h4><div class="meta">10 月 6 日 周二 · 主区域：泉州古城 + 蟳埔</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:00</div><div class="tx"><b>早餐：八市（第八市场）</b><small>沙茶面、芋包，退房前解决</small></div></div>
+        <div class="row t"><div class="tm">08:30</div><div class="tx"><b>退房 → 厦门站</b><small>厦门站就在岛内，比绕去厦门北省近 40 分钟</small></div></div>
+        <div class="row t"><div class="tm">09:20</div><div class="tx"><b>厦门 → 泉州</b><small>动车 46–53 分钟，二等座 ¥42</small></div></div>
+        <div class="row h"><div class="tm">10:30</div><div class="tx"><b>泉州站 → 西街 · 钟楼</b><small>打车约 ¥30–40/车，入住并寄存行李</small></div></div>
+        <div class="row"><div class="tm">11:15</div><div class="tx"><b>开元寺 + 东西塔</b><small><span class="pill g">免费</span> 06:30–17:00</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>午餐：西街片区</b><small>烧肉粽、牛肉羹、面线糊，边走边吃</small></div></div>
+        <div class="row"><div class="tm">14:00</div><div class="tx"><b>府文庙 → 清净寺 → 关岳庙 → 天后宫</b><small>四点都在古城核心区 1 公里内，全程步行 · 均<span class="pill g">免费</span></small></div></div>
+        <div class="row"><div class="tm">16:00</div><div class="tx"><b>蟳埔村簪花围</b><small>¥40/人含服饰，含化妆约 ¥80；打车约 25 分钟</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：斯丹姜母鸭（涂门街）</b><small>三年老姜 + 番鸭砂锅慢炖，人均约 ¥65</small></div></div>
+        <div class="row"><div class="tm">20:00</div><div class="tx"><b>提线木偶戏 或 南音演出</b><small>木偶戏 ¥30/50/80；南音《南音"偶"遇》10/3–10/6 演出，¥109/129</small></div></div>
+      </div>
+      <div class="callout warn"><b>这天上午半天在路上</b>，是全程最需要卡时间的一天。泉州古城四个世遗点集中在 1 公里内，步行能绕完；若在蟳埔待久了，把<b>天后宫</b>挪到 10/7 上午补 —— 就在古城内，返程前顺路。</div>
+      <div class="callout danger" style="margin-bottom:0"><b>避雷：</b>西街网红竹筒茶排队严重，不必为它耗时间。关岳庙门口可免费领 3 支香，<b>不要买高价香烛</b>。</div>
+    </div>
+  </div>
+
+  <!-- D5 -->
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff3b30"><div class="d">D5</div><div class="n">7</div></div>
+      <div><h4>泉州 → 广州</h4><div class="meta">10 月 7 日 周三 · 主区域：泉州（清源山 / 西街）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:00</div><div class="tx"><b>早餐：水门国仔面线糊</b><small>水门巷总店，凌晨 4 点起锅熬汤。必加醋肉、海蛎、鸭血</small></div></div>
+        <div class="row"><div class="tm">08:00</div><div class="tx"><b>清源山</b><small><span class="pill o">¥59</span> 现场购票，无需预约 · 或 洛阳桥（<span class="pill g">免费</span>）</small></div></div>
+        <div class="row"><div class="tm">11:00</div><div class="tx"><b>古城补漏</b><small>若昨天没走完，清净寺 / 关岳庙 / 天后宫 此时补上，都在古城内</small></div></div>
+        <div class="row f"><div class="tm">12:00</div><div class="tx"><b>午餐：泉州最后一餐</b><small>姜母鸭或面线糊二选一</small></div></div>
+        <div class="row"><div class="tm">13:00</div><div class="tx"><b>西街买伴手礼</b><small>源和堂蜜饯、永春老醋、老范志神曲</small></div></div>
+        <div class="row t"><div class="tm">15:30</div><div class="tx"><b>打车至泉州东站</b><small>台商投资区东园镇，距市区约 11 公里，25–35 分钟，¥40–55/车</small></div></div>
+        <div class="row t"><div class="tm">18:55</div><div class="tx"><b>泉州东 → 广州东 G3051</b><small>4 小时 16 分，二等座 ¥453</small></div></div>
+        <div class="row"><div class="tm">23:11</div><div class="tx"><b>抵广州东</b></div></div>
+      </div>
+      <h3>返程车次备选</h3>
+      <div class="scroll">
+        <table class="tbl">
+          <thead><tr><th>方案</th><th>出发</th><th>到达</th><th>时长</th><th>二等座</th></tr></thead>
+          <tbody>
+            <tr><td>G3051（推荐）</td><td class="num">泉州东 18:55</td><td class="num">广州东 23:11</td><td class="num">4h16m</td><td class="num">¥453</td></tr>
+            <tr><td>G3051（提前下）</td><td class="num">泉州东 18:55</td><td class="num">广州新塘 22:47</td><td class="num">3h52m</td><td class="num">¥422</td></tr>
+            <tr><td>G3047</td><td class="num">泉州东 13:42</td><td class="num">广州东 17:24</td><td class="num">3h42m</td><td>以 12306 为准</td></tr>
+            <tr><td><b>拆票方案</b></td><td colspan="3">泉州 → 厦门北（约 ¥32）+ 厦门北 → 广州南（¥308.5）</td><td class="num ok">合计约 ¥340.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout ok" style="margin-bottom:0"><b>拆票比直达每人便宜约 ¥112</b>，且厦门北 → 广州南车次密集、候补成功率高。这段拆票<b>顺着返程方向走（泉州 → 厦门北 → 漳州 → 潮汕 → 广州）</b>，不是折返。如果直达票抢不到，果断走拆票。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 4 餐饮 ══════════ -->
+<section id="s4">
+  <h2><span class="n">4</span>餐饮方案</h2>
+  <p class="sub">先保当天区域顺路，再选店。不为一家名店把整天路线拧弯。</p>
+
+  <h3>厦门</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>餐次</th><th>区域</th><th>主推</th><th>备选</th><th>判断</th></tr></thead>
+      <tbody>
+        <tr><td>早餐</td><td>中山路 / 思北</td><td><b>思北花生汤</b>（约 ¥8）</td><td>佳味再添小吃店（07:00–21:00）</td><td>佳味再添是老国营店，沙茶面、芋包、肉粽、土笋冻一站吃全，适合到厦门第一天试水</td></tr>
+        <tr><td>午餐</td><td>八市 / 中山路</td><td><b>四里沙茶面</b>（湖滨四里老店）</td><td>乌糖沙茶面</td><td>开了 40 多年的沙茶面鼻祖，非网红店，加料后约 ¥20，汤底可喝光</td></tr>
+        <tr><td>小吃</td><td>局口街</td><td><b>莲欢海蛎煎</b></td><td>天河西门土笋冻（约 ¥15/份）</td><td>藏在中山路局口街深巷，本地人公认的海蛎煎天花板，配甜辣酱解腻</td></tr>
+        <tr><td>晚餐</td><td>沙坡尾 / 厦大西村</td><td><b>开元路 141 大排档</b>（酱油水海鲜）</td><td>八市朱记手撕鸡、阿杰五香</td><td>酱油水是厦门本地做法，比网红海鲜排档实在</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>泉州</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>餐次</th><th>区域</th><th>主推</th><th>备选</th><th>判断</th></tr></thead>
+      <tbody>
+        <tr><td>早餐</td><td>水门巷 / 西街</td><td><b>水门国仔面线糊</b>（水门巷总店）</td><td>曾氏老记面线糊（西街 17 号）</td><td>开了近 40 年，凌晨 4 点起锅熬汤，泉州面线糊天花板。必加醋肉、海蛎、鸭血。安排在 10/7 早餐</td></tr>
+        <tr><td>午餐</td><td>西街</td><td><b>西街片区小吃</b>：烧肉粽、牛肉羹</td><td>面线糊第二家</td><td>边走边吃，不占用行程</td></tr>
+        <tr><td>晚餐</td><td>涂门街 / 崇福路</td><td><b>斯丹姜母鸭</b>（涂门街 30 年老店）</td><td>张林阿山姜母鸭 / 忠记盐烧姜母鸭</td><td>上过《舌尖》。三年老姜 + 番鸭砂锅慢炖，人均约 ¥65，汤汁拌饭是精华</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>漳州</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>餐次</th><th>区域</th><th>主推</th><th>备选</th><th>判断</th></tr></thead>
+      <tbody>
+        <tr><td>早餐</td><td>漳州古城</td><td><b>面煎粿 + 豆花粉丝</b></td><td>古城内任意一家锅边糊</td><td>D2 上午要赶 9 点多的动车，在古城内就近解决，别跑远</td></tr>
+        <tr><td>正餐</td><td>漳州古城</td><td><b>阿芬卤面</b>（延安南路中闽旁）</td><td>洋老州卤面（大通北路漳州一中后门对面）</td><td>漳州卤面汤底浓郁、配料足，是本地人的日常。D1 晚餐在这两家二选一</td></tr>
+        <tr><td>小吃</td><td>青年路 / 古城边</td><td><b>天宝洪坑手抓面</b>（青年路 83 号）</td><td>小洪四果汤（古城边上，人均约 ¥7）</td><td>手抓面筋道，浇芥末、沙茶酱、辣椒酱，配炸五香</td></tr>
+        <tr><td>甜品</td><td>青年路</td><td><b>原公园后门四果汤</b>（青年路 187 号）</td><td>可来屋（中山公园南门芳华横路东）</td><td>厚沙冰 + 蜜糖水 + 满料，漳州夏天的标准答案</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 5 交通 ══════════ -->
+<section id="s5">
+  <h2><span class="n">5</span>交通方案与可行性核验</h2>
+  <p class="sub">大交通与当地交通逐段决策，并标明可行性与风险。</p>
+
+  <h3>大交通（城际高铁）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>段</th><th>车次参考</th><th>时长</th><th>二等座</th><th>可行性</th></tr></thead>
+      <tbody>
+        <tr><td>广州南 → 漳州</td><td>G1023 / G3741 / G3809</td><td class="num">3h25m–3h51m</td><td class="num"><b>¥283.5</b></td><td><span class="pill r">需候补</span> 直达车次较少（约 12 趟/天），是全程最可能抢不到的一段</td></tr>
+        <tr><td>漳州 → 厦门</td><td>D672 / D9187 / C 字头城际</td><td class="num">30–37 分钟</td><td class="num"><b>¥21</b></td><td><span class="pill g">较稳</span> 班次密，短途票相对好买</td></tr>
+        <tr><td>厦门 → 泉州</td><td>D3234 / D6202 / D2376</td><td class="num">46–53 分钟</td><td class="num"><b>¥42</b></td><td><span class="pill g">较稳</span> 中等班次</td></tr>
+        <tr><td>泉州东 → 广州东</td><td>G3051</td><td class="num">4h16m</td><td class="num"><b>¥453</b></td><td><span class="pill r">需候补</span> 直达车次少，10/7 是返程最高峰，建议候补 + 拆票双保险</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>为什么这个顺序不折返：</b>厦深线从广东进福建的走向本身就是<b>漳州 → 厦门 → 泉州</b>（自西南向东北）。所以按「广州南 → 漳州 → 厦门 → 泉州 → 广州」走，四段城际全部顺向，没有一段是回头路。原来的「厦门 → 漳州 → 泉州」等于在漳州和厦门之间往返坐了两遍。
+  </div>
+
+  <h3>当地交通（逐段决策）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>段</th><th>方案</th><th>成本</th><th>为什么这么选</th></tr></thead>
+      <tbody>
+        <tr><td>厦门北站 → 岛内中山路</td><td><b>地铁 1 号线</b>直达镇海路站</td><td class="num">¥7/人 · 约 40 分钟</td><td>仅在买不到「漳州 → 厦门站」时用到。打车约 ¥60–80 且高峰堵车 1 小时以上，地铁更快更便宜</td></tr>
+        <tr><td>厦门市内</td><td>地铁（1/2/3/4 号线，2 元起、最高 8 元）+ 打车</td><td class="num">约 ¥90/人 / 3 天</td><td>打车起步 ¥10/3km，每公里 ¥2，23:00–05:00 加价 20%。岛内地铁覆盖好</td></tr>
+        <tr><td>厦鼓码头 ↔ 鼓浪屿</td><td>轮渡</td><td class="num">¥35/人 往返</td><td>唯一方式，车不能上岛</td></tr>
+        <tr><td>漳州站 ↔ 漳州古城</td><td>打车 / B1 路公交</td><td class="num">打车 ¥19–20/车（11km）</td><td>4 人分摊约 ¥5/人</td></tr>
+        <tr><td>漳州市内</td><td>步行 + 打车 + 芗城网约公交 ¥2</td><td class="num">约 ¥20/人</td><td>古城内全程步行；打车起步 ¥7/2km，每公里 ¥1.8</td></tr>
+        <tr><td>漳州站 → 厦门站</td><td>动车</td><td class="num">¥21/人 · 30–37 分钟</td><td>厦门站在<b>岛内</b>，出站 15–20 分钟到中山路；比坐到厦门北再转地铁省近 40 分钟</td></tr>
+        <tr><td>泉州站/泉州南站 → 西街</td><td>打车</td><td class="num">约 ¥30–40/车</td><td>泉州站离古城约 7–10km</td></tr>
+        <tr><td>泉州市内</td><td>公交 ¥2 + 打车 + 步行/共享单车</td><td class="num">约 ¥90/人 / 2 天</td><td>泉州<b>无运营地铁</b>（R1 线在建，国庆前不通）。打车起步 ¥8–9/3km，每公里 ¥1.6–2</td></tr>
+        <tr><td>市区 → 泉州东站</td><td>打车</td><td class="num">约 ¥40–55/车（约 11km）</td><td>泉州东站在台商投资区东园镇，比较偏</td></tr>
+        <tr class="total"><td>合计</td><td colspan="2" class="num">约 ¥255/人</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>为什么全程不租车：</b>
+    <br>① 鼓浪屿车辆不能上岛，租车在厦门有 2 天是纯浪费；
+    <br>② 厦门国庆景区停车位紧张、岛内限行多；
+    <br>③ 泉州古城、漳州古城核心区都适合步行，车反而是累赘；
+    <br>④ 异地还车（厦门取、泉州还）还要加收还车费。
+    <br><b>只有在加南靖土楼或东山岛时，租车/包车才划算 —— 而这两个点本次已砍掉。</b>
+  </div>
+</section>
+
+<!-- ══════════ 6 住宿 ══════════ -->
+<section id="s6">
+  <h2><span class="n">6</span>住宿方案</h2>
+  <p class="sub">4 晚：漳州 1 晚 + 厦门 2 晚 + 泉州 1 晚。漳州住古城边，第二天一早动车去厦门。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>城市</th><th>日期</th><th>推荐片区</th><th>房型</th><th>国庆单间夜</th><th>小计（2 间）</th></tr></thead>
+      <tbody>
+        <tr><td>漳州</td><td class="num">10/3–10/4</td><td>古城 / 文庙 / 青年路一带</td><td>经济型连锁（汉庭文庙店 / 如家古城华驿）</td><td class="num">¥275–400</td><td class="num">¥550–800</td></tr>
+        <tr><td>厦门</td><td class="num">10/4–10/6</td><td>思明区中山路 / 轮渡 / 沙坡尾一带</td><td>中端连锁（亚朵/维也纳）或精品民宿</td><td class="num">¥450–600</td><td class="num">¥1,800–2,400</td></tr>
+        <tr><td>泉州</td><td class="num">10/6–10/7</td><td>西街 / 钟楼 / 开元寺周边</td><td>中端连锁（全季西街中山路店等）</td><td class="num">¥350–500</td><td class="num">¥700–1,000</td></tr>
+        <tr class="total"><td colspan="5">合计（4 晚）</td><td class="num">¥3,050–4,200</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout ok"><b>选片区逻辑：</b>漳州住<b>古城 / 文庙一带</b>，香港路骑楼、台湾路步行可达，次日打车去漳州站也只要 20 分钟。厦门住<b>思明区岛内</b> —— 不要住鼓浪屿岛上（贵、搬行李累、餐饮宰客）、不要住曾厝垵（吵）、不要住厦门北站（在岛外，每天进岛 40 分钟）。泉州住<b>西街/钟楼片区</b>，开元寺、文庙、清净寺、关岳庙、天后宫全部步行可达，省掉大量打车。</div>
+  <div class="callout danger"><b>满房风险：</b>国庆旺季热门片区通常提前 2–3 周就锁房，现在属于「高价捡漏」阶段。厦门热门商圈民宿国庆涨幅 50%–100%，主城区连锁酒店涨幅约 30%。<b>建议今天就把三段住宿定死</b>，尤其是厦门岛内 10/4–10/6 两晚。</div>
+  <div class="callout info" style="margin-bottom:0"><b>经济型备选（想压预算）：</b>汉庭 / 如家 / 全季，厦门国庆约 ¥150–400/晚；漳州古城文庙汉庭约 ¥275/晚起、如家古城华驿约 ¥278/晚起。但泉州西街片区经济型房源少，价格会偏高。</div>
+</section>
+
+<!-- ══════════ 7 预算 ══════════ -->
+<section id="s7">
+  <h2><span class="n">7</span>预算总表</h2>
+  <p class="sub">按 4 人（2 间房）计算，3 人版本见下方。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>人均</th><th>4 人合计</th></tr></thead>
+      <tbody>
+        <tr><td><b>大交通</b></td><td>广州南→漳州 283.5 ＋ 漳州→厦门 21 ＋ 厦门→泉州 42 ＋ 泉州东→广州东 453</td><td class="num"><b>¥799.5</b></td><td class="num">¥3,198</td></tr>
+        <tr><td><b>当地交通</b></td><td>地铁 / 公交 / 打车分摊</td><td class="num"><b>¥255</b></td><td class="num">¥1,020</td></tr>
+        <tr><td><b>住宿</b></td><td>漳州 1 晚 + 厦门 2 晚 + 泉州 1 晚，2 间</td><td class="num"><b>¥763–1,050</b></td><td class="num">¥3,050–4,200</td></tr>
+        <tr><td><b>门票体验</b></td><td>鼓浪屿船票 35 ＋ 清源山 59 ＋ 蟳埔簪花 40 ＋ 木偶戏 30–80</td><td class="num"><b>¥165–215</b></td><td class="num">¥660–860</td></tr>
+        <tr><td>可选加项</td><td>植物园 30 / 胡里山炮台 25 / 南音演出 109–129 / 云洞岩 20</td><td class="num">¥0–200</td><td class="num">¥0–800</td></tr>
+        <tr><td><b>餐饮</b></td><td>人均 ¥100–150/天 × 5 天</td><td class="num"><b>¥500–750</b></td><td class="num">¥2,000–3,000</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥2,480–3,070</td><td class="num hi">约 0.99–1.23 万元</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>按 3 人计算</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td>大交通</td><td class="num">¥799.5</td></tr>
+        <tr><td>当地交通（打车分摊更少）</td><td class="num">约 ¥290</td></tr>
+        <tr><td>住宿（总额不变，摊到 3 人）</td><td class="num">¥1,017–1,400</td></tr>
+        <tr><td>门票体验</td><td class="num">¥165–215</td></tr>
+        <tr><td>餐饮</td><td class="num">¥500–750</td></tr>
+        <tr class="total"><td>合计</td><td class="num hi">约 ¥2,770–3,450</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>省钱杠杆（按效果排序）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td><b>返程改拆票</b>：泉州→厦门北（¥32）+ 厦门北→广州南（¥308.5）＝ ¥340.5</td><td class="num ok">每人省约 ¥112</td></tr>
+        <tr><td><b>住宿降一档</b>：厦门从精品民宿改经济型连锁，两晚每间省 ¥200–300</td><td class="num ok">每人省 ¥200–300</td></tr>
+        <tr><td><b>砍掉可选加项</b>：植物园、胡里山炮台、南音演出全砍</td><td class="num ok">每人省 ¥200</td></tr>
+        <tr><td><b>餐饮控制在人均 ¥100/天</b>：多吃小吃、少进海鲜大排档</td><td class="num ok">每人省约 ¥250</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout ok" style="margin-bottom:0">三项叠加，人均可压到 <b>约 ¥2,000</b>。</div>
+</section>
+
+<!-- ══════════ 8 砍点 ══════════ -->
+<section id="s8">
+  <h2><span class="n">8</span>砍掉了什么，为什么</h2>
+  <p class="sub">不是不好，是 5 天塞不下，且国庆去是遭罪。</p>
+  <div class="cut">
+    <div class="c"><div class="t">南靖土楼（田螺坑 / 云水谣）· 门票 ¥90</div><div class="d">从厦门或漳州单程 2–3 小时，来回占掉整整一天，必须包车或跟团。国庆田螺坑观景台排队风险高。<b>留给下次专门去。</b></div></div>
+    <div class="c"><div class="t">东山岛（风动石 ¥45–60，南门湾免费）</div><div class="d">在漳州最南端，厦门/漳州出发要拼车或包车。海岛受台风影响大，国庆人流爆。</div></div>
+    <div class="c"><div class="t">漳州火山岛 / 镇海角 · ¥60 起，套票 ¥158</div><div class="d">交通同样依赖包车，且第三方评价有「设施老化、性价比低」的负面反馈，预期要降低。</div></div>
+    <div class="c"><div class="t">厦门园林植物园（¥30）/ 胡里山炮台（¥25）</div><div class="d">保留为<b>可选加项</b>，不占主线。Day 3 若鼓浪屿因雨缩水，可顶上。</div></div>
+    <div class="c"><div class="t">泉州洛阳桥（免费）</div><div class="d">保留为 Day 5 清源山的<b>备选</b>，但离古城约 10km 往东北，和泉州东站方向不完全一致，只在不去清源山时替换。</div></div>
+    <div class="c"><div class="t">集美学村（免费）</div><div class="d">在集美区。改顺序后<b>全程不再经过厦门北站</b>，没有顺路的机会，直接砍掉。</div></div>
+  </div>
+  <div class="callout info" style="margin-bottom:0"><b>逻辑：</b>一天一个主区域，一天最多一个需要预约的点。宁可少去一个点，也不要把行程排成赶场。</div>
+</section>
+
+<!-- ══════════ 9 避雷 ══════════ -->
+<section id="s9">
+  <h2><span class="n">9</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">票务</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>不要买鼓浪屿黄牛票、代售票。无现场票，只认「屿见厦门」官方渠道</li>
+        <li>不要在第三方平台买「厦门北站」的票却订了岛内酒店</li>
+        <li>厦门大学<b>不接受旅行社、中介团体预约</b>，只能个人实名预约</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">餐饮</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>鼓浪屿岛上餐饮、海鲜、特产价格显著偏高，正餐回岛内吃</li>
+        <li>曾厝垵、中山路、沙坡尾国庆极易拥堵，逛吃可以，别安排正餐</li>
+        <li>泉州西街网红竹筒茶排队严重，别为它耗时间</li>
+        <li>泉州关岳庙门口可免费领 3 支香，不要买高价香烛</li>
+        <li>蟳埔簪花围<b>全村统一 ¥40/人</b>（含服饰），含化妆约 ¥80；跟拍另计，先问清再拍</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">景点</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>鼓浪屿每日最大承载量 5 万人，国庆尽早购票</li>
+        <li>南靖土楼、东山岛、火山岛若临时加进去，务必先查天气和景区开放状态</li>
+        <li>清源山 ¥59 现场买票、无需预约，但国庆上午排队会长</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">其他</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10 月上旬福建仍有台风风险，出发前 3 天查中央气象台 / 福建省气象局预警</li>
+        <li>国庆期间厦漳泉城际动车也可能紧张，短途票建议和长途票一起提前买</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 10 天气备案 ══════════ -->
+<section id="s10">
+  <h2><span class="n">10</span>天气与备案</h2>
+  <p class="sub">行程是出发前的参考坐标，不是旅途中必须执行的脚本。天气、体力、饥饿程度都可以覆盖原计划。</p>
+
+  <div class="callout warn"><b>已知预报：</b>厦门国庆期间 23–28℃，<b>10 月 4–5 日有小到中雨</b>。泉州、漳州 10 月上旬预报暂未查到权威数据，以出发前 3 天为准。2026 年 10 月初西北太平洋台风情况暂无权威报道，需临近关注。</div>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>原计划</th><th>雨备选</th></tr></thead>
+      <tbody>
+        <tr><td>鼓浪屿户外步行</td><td>菽庄花园钢琴博物馆、风琴博物馆、鼓浪屿音乐厅（室内）</td></tr>
+        <tr><td>环岛路 / 曾厝垵</td><td>中山路骑楼（有遮挡）、八市、厦门博物馆</td></tr>
+        <tr><td>漳州古城步行</td><td>古城内骑楼有遮挡，影响不大</td></tr>
+        <tr><td>清源山（Day 5）</td><td>改洛阳桥，或开元寺补漏 + 西街室内茶馆</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>体力备案</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>情况</th><th>怎么调</th></tr></thead>
+      <tbody>
+        <tr><td>Day 2 赶车吃力</td><td>漳州站直接打车到厦门酒店，砍掉环岛路 / 白城沙滩，改中山路骑楼</td></tr>
+        <tr><td>Day 3 鼓浪屿遇雨</td><td>走室内馆（钢琴博物馆 / 风琴博物馆 / 音乐厅），或直接改八市 + 中山路</td></tr>
+        <tr><td>Day 4 泉州古城逛不完</td><td>把清净寺 / 关岳庙 / 天后宫 挪到 Day 5 上午补，都在古城内</td></tr>
+        <tr><td>Day 4 木偶戏 / 南音没抢到票</td><td>改为西街夜逛 + 中山路骑楼</td></tr>
+        <tr><td>Day 5 不想爬清源山</td><td>直接在西街片区慢逛、买伴手礼，中午提前去泉州东站附近吃饭</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  2026 年国庆放假安排（国务院办公厅）· <a href="https://www.gov.cn/zhengce/content/202511/content_7047090.htm" target="_blank">gov.cn</a><br>
+  火车票预售期查询（12306 官方）· <a href="https://hzfw.12306.cn/zgzfw/resources/web/ysqcx.html" target="_blank">12306.cn</a><br>
+  候补购票规则 · <a href="https://mobile.12306.cn/otsmobile/h5/otsbussiness/houbuRules/houbuRules.html" target="_blank">12306.cn</a><br>
+  鼓浪屿轮渡票价公示 · <a href="https://www.xmferry.com/mtjjt/ylzhxmt/hxjpj/25335.htm" target="_blank">xmferry.com</a><br>
+  厦门大学访客预约指南 · <a href="https://baowei.xmu.edu.cn/info/1003/1005.htm" target="_blank">xmu.edu.cn</a><br>
+  厦门地铁票价（本地宝）· <a href="http://xm.bendibao.com/traffic/2026918/97391.shtm" target="_blank">bendibao.com</a><br>
+  厦门出租车运价（厦门市发改委）· <a href="https://dpc.xm.gov.cn/xwdt/tzgg/202601/t20260130_2979655.htm" target="_blank">xm.gov.cn</a><br>
+  泉州清源山门票 · <a href="https://qysfjq.com/Article/Article_Show.aspx?classid=49&id=207" target="_blank">qysfjq.com</a><br>
+  南铁国庆加开列车（福建省政府）· <a href="https://www.fujian.gov.cn/xwdt/mszx/202609/t20260923_7217138.htm" target="_blank">fujian.gov.cn</a>
+  <p style="margin-top:14px">价格与车次均为 2026 年 9 月 30 日检索口径，国庆期间浮动较大，<b>下单前请以 12306、酒店平台实时报价为准</b>。</p>
+</footer>
+
+</div>
+
+<script>
+// ══════════ 地图数据 ══════════
+const CITIES = {
+  d1:{label:'D1 广州→漳州', color:'#007aff', pts:[
+    {n:'漳州站',city:'漳州',lat:24.5060,lng:117.6720,t:'transport',d:'距漳州古城约11km，打车约20元'},
+    {n:'漳州古城',city:'漳州',lat:24.5130,lng:117.6470,t:'spot',d:'香港路骑楼、台湾路，全程步行'},
+    {n:'漳州文庙',city:'漳州',lat:24.5140,lng:117.6440,t:'spot',d:'古城内'},
+    {n:'云洞岩',city:'漳州',lat:24.5560,lng:117.7300,t:'spot',d:'备选，约20元'}
+  ]},
+  d2:{label:'D2 漳州→厦门', color:'#af52de', pts:[
+    {n:'厦门站',city:'厦门',lat:24.4720,lng:118.1030,t:'transport',d:'岛内思明区，到中山路15-20分钟'},
+    {n:'厦门大学',city:'厦门',lat:24.4370,lng:118.0960,t:'spot',d:'需公众号预约进校'},
+    {n:'南普陀寺',city:'厦门',lat:24.4410,lng:118.0930,t:'spot',d:'免费，需实名分时预约'},
+    {n:'沙坡尾避风坞',city:'厦门',lat:24.4400,lng:118.0850,t:'spot',d:'老渔港文创区'},
+    {n:'白城沙滩',city:'厦门',lat:24.4340,lng:118.0930,t:'spot',d:'看海、日落'},
+    {n:'演武大桥观景台',city:'厦门',lat:24.4350,lng:118.0900,t:'spot',d:'夜景'},
+    {n:'中山路步行街',city:'厦门',lat:24.4528,lng:118.0820,t:'spot',d:'骑楼夜景 + 局口街小吃'}
+  ]},
+  d3:{label:'D3 鼓浪屿', color:'#ff9500', pts:[
+    {n:'邮轮中心厦鼓码头',city:'厦门',lat:24.4790,lng:118.0720,t:'transport',d:'游客去鼓浪屿的主要出发码头'},
+    {n:'三丘田码头',city:'厦门',lat:24.4500,lng:118.0660,t:'transport',d:'鼓浪屿登岛点'},
+    {n:'日光岩',city:'厦门',lat:24.4460,lng:118.0670,t:'spot',d:'鼓浪屿制高点'},
+    {n:'菽庄花园',city:'厦门',lat:24.4420,lng:118.0630,t:'spot',d:'钢琴博物馆，雨天备选'},
+    {n:'八市（第八市场）',city:'厦门',lat:24.4570,lng:118.0790,t:'spot',d:'回岛内后逛吃'},
+    {n:'曾厝垵 / 环岛路',city:'厦门',lat:24.4270,lng:118.1250,t:'spot',d:'看海、日落'}
+  ]},
+  d4:{label:'D4 厦门→泉州', color:'#34c759', pts:[
+    {n:'厦门站',city:'厦门',lat:24.4720,lng:118.1030,t:'transport',d:'乘动车去泉州，46-53分钟'},
+    {n:'泉州站',city:'泉州',lat:24.9296,lng:118.5477,t:'transport',d:'打车至西街约30-40元'},
+    {n:'开元寺',city:'泉州',lat:24.9147,lng:118.5860,t:'spot',d:'免费，06:30-17:00'},
+    {n:'泉州府文庙',city:'泉州',lat:24.9130,lng:118.5870,t:'spot',d:'免费'},
+    {n:'清净寺',city:'泉州',lat:24.9110,lng:118.5900,t:'spot',d:'免费'},
+    {n:'关岳庙',city:'泉州',lat:24.9090,lng:118.5900,t:'spot',d:'免费，门口可领3支香'},
+    {n:'天后宫',city:'泉州',lat:24.9030,lng:118.5870,t:'spot',d:'免费'},
+    {n:'蟳埔村',city:'泉州',lat:24.8860,lng:118.6320,t:'spot',d:'簪花围40元/人含服饰'}
+  ]},
+  d5:{label:'D5 泉州→广州', color:'#ff3b30', pts:[
+    {n:'水门巷',city:'泉州',lat:24.9100,lng:118.5920,t:'spot',d:'水门国仔面线糊早餐'},
+    {n:'清源山',city:'泉州',lat:24.9450,lng:118.5900,t:'spot',d:'59元，现场购票'},
+    {n:'洛阳桥',city:'泉州',lat:24.9560,lng:118.6790,t:'spot',d:'免费，备选'},
+    {n:'西街 · 钟楼',city:'泉州',lat:24.9140,lng:118.5880,t:'spot',d:'买伴手礼'},
+    {n:'泉州东站',city:'泉州',lat:24.8890,lng:118.7120,t:'transport',d:'台商投资区东园镇，距西街约23km、需预留1小时车程'}
+  ]}
+};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[24.75,118.20],zoom:8,zoomControl:true,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+const EMOJI={transport:'🚄',spot:'📍'};
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent(p.city+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.55,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:12});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>

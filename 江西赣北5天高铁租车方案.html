@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>广州 ⇄ 江西赣北 · 5天4晚方案（高铁往返 + 南昌租还车）</title>
+<meta name="description" content="2026国庆 10/2–10/6 广州出发 5天走江西赣北：高铁往返南昌 + 同城租还车，南昌 → 庐山 → 景德镇 → 婺源 → 南昌，含大交通、租车、逐日行程与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线地图</a>
+  <a href="#s3">高铁与租车</a>
+  <a href="#s4">逐日行程</a>
+  <a href="#s5">吃在赣北</a>
+  <a href="#s6">住宿</a>
+  <a href="#s7">预算</a>
+  <a href="#s8">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 10/2 – 10/6 · 赣北环线</div>
+  <h1>广州 ⇄ 江西赣北 5 天 4 晚</h1>
+  <p>高铁往返南昌 + 同城租还车 · 庐山 · 景德镇 · 婺源</p>
+  <div class="tags">
+    <span>高铁 3h40m 到南昌</span><span>南昌同城租还车</span>
+    <span>当地自驾约 735 km</span><span>人均 ¥3,000–4,100</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>这一版怎么定的</h2>
+  <p class="sub">5 天 4 晚只够赣北三个点，所以砍掉吉安、赣州，车改在南昌同城还，省掉异地还车费。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>目的地</th><th>离南昌</th><th>离佛山单程</th><th>安排</th></tr></thead>
+      <tbody>
+        <tr><td><b>庐山（九江）</b></td><td class="num">约 130 km</td><td class="num">约 900 km</td><td><span class="pill g">D2–D3</span></td></tr>
+        <tr><td><b>景德镇</b></td><td class="num">约 290 km</td><td class="num">约 900 km</td><td><span class="pill g">D3–D4</span></td></tr>
+        <tr><td><b>婺源</b></td><td class="num">约 280 km</td><td class="num">约 950 km</td><td><span class="pill g">D4–D5</span></td></tr>
+        <tr><td>吉安</td><td class="num">约 200 km</td><td class="num">约 650 km</td><td><span class="pill r">本次不去</span></td></tr>
+        <tr><td>赣州</td><td class="num">约 380 km</td><td class="num">约 440 km</td><td><span class="pill r">本次不去</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>三处关键改动：</b>①<b>高铁往返都走南昌</b>——去程 3h40m，返程同样 3h40m，把 800 km 自驾彻底替掉；②<b>车在南昌同城取还</b>——零异地还车费，代价是最后一天要从婺源开 280 km 回南昌；③<b>砍掉吉安、赣州</b>——5 天只够赣北三点玩扎实，硬塞赣南就变成全程赶路。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">最大优势</div>
+      <div class="v">同城还车</div>
+      <div class="d">南昌西站取、南昌西站还，异地还车费为 ¥0，比赣州西还车省 ¥200–600。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">核心约束</div>
+      <div class="v">D5 开 280 km</div>
+      <div class="d">婺源 → 南昌约 280 km、3.5 小时，再赶高铁。这是全程最需要卡时间的一天。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">必须预约</div>
+      <div class="v">庐山 · 篁岭</div>
+      <div class="d">庐山国庆强制交通换乘；篁岭晒秋季限流，两者都要提前预约。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">最长单日</div>
+      <div class="v">280 km</div>
+      <div class="d">D5 婺源→南昌。其余每天车程都在 160 km 以内。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。前四项是硬门槛，尤其往返高铁票。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">抢去程高铁：广州南 → 南昌西（10/2）</div><div class="m">G 字头约 3h35m–3h45m，二等座约 ¥500–540。<b>国庆热门方向，开售即订或候补。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">抢返程高铁：南昌西 → 广州南（10/6）</div><div class="m">同一区段、同样约 3h40m，二等座约 ¥500–540。10/6 仍是假期返程高峰，尽早锁定。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预订租车（南昌西取 · 南昌西还）</div><div class="m">南昌西站内可取：神州在<b>南广场负二层 W 区（24h）</b>，一嗨在南广场负 2 楼 206 商铺。<b>同城取还，确认无异地费。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订庐山山上住宿（牯岭镇，2 晚）</div><div class="m">国庆牯岭房源最紧、价格最高，是全程最大变量。订不到就改住九江市区，每天换乘上山。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约庐山门票 + 观光车</div><div class="m">10/1–10/7 核心景区强制交通换乘，车辆停南/北门换乘中心或索道停车场，观光车 ¥90（含上下山 + 山上）。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预约婺源篁岭</div><div class="m">9–11 月晒秋季，国庆限流。门票 + 往返索道约 ¥145，建议约下午场，赶 16:00–17:00 的黄金光。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查沿途充电桩</div><div class="m">庐山山上桩少且排队；景德镇、婺源县城较方便；景区周边（篁岭、三叠泉）紧张。用地图 App 查实时桩况。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备雨具和薄外套</div><div class="m">庐山山上 10 月夜间可低至 10℃ 上下，比山下低 5–8℃，早晚必须加衣。</div></div><span class="due p2">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线与地图</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>去程</td><td>广州南 → <b>高铁</b> → 南昌西 → 站内取车</td></tr>
+        <tr><td>环线</td><td>南昌 → 庐山 → 景德镇 → 婺源 → 南昌（<b>顺时针一圈</b>）</td></tr>
+        <tr><td>返程</td><td>南昌西站还车 → <b>高铁</b> → 广州南</td></tr>
+        <tr><td>当地里程</td><td class="num">约 735 km（含市内与山上）</td></tr>
+        <tr><td>过路费</td><td><b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下），全程落在免费窗口内</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>环线顺序为什么是"南昌 → 庐山 → 景德镇 → 婺源 → 南昌"：</b>庐山在南昌正北、景德镇在东北、婺源在最东，按这个顺序是顺时针绕一圈，中间没有重复路段；只有最后一段婺源回南昌是"收口"，约 280 km，属于必须付的代价。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>高铁与租车</h2>
+  <p class="sub">这一节决定整趟行程的可行性，先定票和车，再谈行程。</p>
+
+  <h3>高铁（往返都是南昌）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>区段</th><th>时长</th><th>二等座</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>广州南 → 南昌西（10/2）</b></td><td class="num">3h35m–3h45m</td><td class="num"><b>¥500–540</b></td><td><span class="pill r">需抢</span> G 字头，国庆热门，建议候补</td></tr>
+        <tr><td><b>南昌西 → 广州南（10/6）</b></td><td class="num">3h35m–3h45m</td><td class="num"><b>¥500–540</b></td><td><span class="pill o">偏紧</span> 10/6 仍在假期内，返程高峰</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>还车方式：南昌同城</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>方案</th><th>异地还车费</th><th>最后一天</th><th>结论</th></tr></thead>
+      <tbody>
+        <tr><td>南昌取 → <b>南昌还</b>（本方案）</td><td class="num ok">¥0</td><td>婺源开 280 km 回南昌还车 → 高铁</td><td><span class="pill g">已采用</span></td></tr>
+        <tr><td>南昌取 → 赣州西还</td><td class="num">同省约 ¥200–600</td><td>还车后 2h 高铁回，但要多玩赣州</td><td><span class="pill o">本次不去赣州</span></td></tr>
+        <tr><td>南昌取 → 佛山还</td><td class="num">跨省，通常 ¥1,000+</td><td>开 430 km 回佛山再还车</td><td><span class="pill r">费钱费力</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>取车点（南昌西站内）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>网点</th><th>位置</th><th>营业</th></tr></thead>
+      <tbody>
+        <tr><td><b>神州租车 · 南昌高铁西站</b></td><td>南昌西站南广场负二层 W 区停车场</td><td class="num">24 小时</td></tr>
+        <tr><td>一嗨租车 · 南昌高铁西站店</td><td>南昌西站南广场负 2 楼 206 商铺</td><td class="num">以门店为准</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout danger">
+    <b>租车三个必查：</b>①<b>是否限制里程</b>（本行程约 735 km，部分套餐有日限）；②<b>取还车时间</b>——D1 到站取车、D5 还车后要赶高铁，都留足 1 小时缓冲；③<b>油/电政策</b>——还车前加满油或充满电，否则按高价补差。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>逐日行程</h2>
+  <p class="sub">两天高铁，三天游玩，最长单日 280 km。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">2</div></div>
+      <div><h4>广州 → 南昌</h4><div class="meta">10 月 2 日 · 高铁 3h40m + 南昌市区</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">08:00</div><div class="tx"><b>广州南 → 南昌西</b><small>G 字头，约 3 小时 40 分，二等座约 ¥500–540</small></div></div>
+        <div class="row c"><div class="tm">11:40</div><div class="tx"><b>抵南昌西，站内取车</b><small>南广场负二层 W 区（神州 24h），出站即取，无缝衔接</small></div></div>
+        <div class="row h"><div class="tm">13:00</div><div class="tx"><b>午餐 + 入住</b><small>住红谷滩或滕王阁附近，方便步行逛</small></div></div>
+        <div class="row f"><div class="tm">15:00</div><div class="tx"><b>滕王阁</b><small>门票约 ¥50，需预约。登阁看赣江，"落霞与孤鹜齐飞"</small></div></div>
+        <div class="row"><div class="tm">17:00</div><div class="tx"><b>万寿宫历史文化街区</b><small><span class="pill g">免费</span> 老南昌街区，小吃集中</small></div></div>
+        <div class="row"><div class="tm">18:30</div><div class="tx"><b>八一广场</b><small>城市地标，夜景</small></div></div>
+        <div class="row f"><div class="tm">19:30</div><div class="tx"><b>晚餐：南昌拌粉 + 瓦罐汤</b><small>再点藜蒿炒腊肉、白糖糕，人均约 ¥40–70</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>D1 为什么轻松：</b>高铁把 800 km 变成 3h40m，11:40 就到南昌，下午加晚上都是有效时间。这一趟的"北上"成本基本被抹掉了。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">3</div></div>
+      <div><h4>南昌 → 庐山</h4><div class="meta">10 月 3 日 · 主区域：庐山（住牯岭镇）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">08:00</div><div class="tx"><b>南昌出发 → 庐山</b><small>约 130 km，2 小时</small></div></div>
+        <div class="row c"><div class="tm">10:00</div><div class="tx"><b>庐山北门换乘中心停车</b><small>国庆强制换乘，车停这里（约 ¥20/天），换观光车或索道上山</small></div></div>
+        <div class="row h"><div class="tm">11:30</div><div class="tx"><b>上山，入住牯岭镇</b><small>行李跟观光车上山，别带大件</small></div></div>
+        <div class="row f"><div class="tm">13:00</div><div class="tx"><b>花径 · 如琴湖 · 锦绣谷</b><small>白居易"人间四月芳菲尽"处，湖边栈道好走</small></div></div>
+        <div class="row f"><div class="tm">16:00</div><div class="tx"><b>美庐别墅 · 庐山会议旧址</b><small>近代史现场，需门票或联票</small></div></div>
+        <div class="row"><div class="tm">18:00</div><div class="tx"><b>牯岭街晚餐</b><small>石鸡、石鱼、庐山云雾茶，山上物价偏高</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>换乘是硬规定：</b>2026 年 10 月 1 日 00:00 至 10 月 7 日 24:00，庐山核心景区所有来山车辆一律停南、北门换乘中心或索道停车场，人员换乘观光车或索道上山。观光车 ¥90（含上下山 + 山上），运营 7:30–18:30，<b>18:30 后山上基本没车</b>，别玩太晚。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff9500"><div class="d">D3</div><div class="n">4</div></div>
+      <div><h4>庐山 → 景德镇</h4><div class="meta">10 月 4 日 · 上午庐山，下午下山转场</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>含鄱口看日出</b><small>可选。要早起，且需提前约车或走观光车首班</small></div></div>
+        <div class="row f"><div class="tm">08:30</div><div class="tx"><b>五老峰</b><small>五峰连绵，登顶约 2–3 小时，体力活</small></div></div>
+        <div class="row f"><div class="tm">12:00</div><div class="tx"><b>山上午餐</b><small>五老峰附近简餐</small></div></div>
+        <div class="row t"><div class="tm">13:30</div><div class="tx"><b>换乘下山，取车</b><small>北门换乘中心取车</small></div></div>
+        <div class="row t"><div class="tm">14:30</div><div class="tx"><b>庐山 → 景德镇</b><small>约 160 km，2.5 小时</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>陶阳里御窑厂</b><small>门票约 ¥50。明清御窑遗址 + 老城弄堂，傍晚人少</small></div></div>
+        <div class="row h"><div class="tm">19:00</div><div class="tx"><b>入住 + 晚餐</b><small>住陶阳里或陶溪川附近，逛夜市方便</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>三叠泉怎么取舍：</b>三叠泉往返约 3 小时且全是台阶，5 天里塞进 D3 会挤掉景德镇。所以本方案把它列为<b>可选项</b>——想玩就把五老峰换成三叠泉，两者只选一个。若都不选，D3 上午可从容看含鄱口 + 花径，中午就下山。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D4</div><div class="n">5</div></div>
+      <div><h4>景德镇 → 婺源</h4><div class="meta">10 月 5 日 · 主区域：篁岭（晒秋）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">08:30</div><div class="tx"><b>古窑民俗博览区</b><small>门票约 ¥95，看拉坯、画坯、烧窑全流程；不感兴趣可直接去婺源</small></div></div>
+        <div class="row f"><div class="tm">11:30</div><div class="tx"><b>午餐：景德镇冷粉 + 碱水粑</b><small>本地小吃，人均约 ¥30</small></div></div>
+        <div class="row t"><div class="tm">13:00</div><div class="tx"><b>景德镇 → 婺源</b><small>约 85 km，1.5 小时</small></div></div>
+        <div class="row f"><div class="tm">15:00</div><div class="tx"><b>篁岭</b><small>门票 + 往返索道约 ¥145。<b>晒秋正季，16:00–17:00 光线最好</b></small></div></div>
+        <div class="row"><div class="tm">17:30</div><div class="tx"><b>晒工坊 · 五桂堂 · 垒心桥</b><small>晒秋台俯瞰全村晒匾，最出片的位置</small></div></div>
+        <div class="row h"><div class="tm">19:00</div><div class="tx"><b>住篁岭山下或婺源县城</b><small>住山下可第二天一早再上，避开索道排队</small></div></div>
+      </div>
+      <div class="callout ok" style="margin-bottom:0"><b>篁岭是这一天的重点：</b>9–11 月是晒秋季，10 月正当季，辣椒、玉米、皇菊铺满晒匾。想看黄金光就要 16:00 前后上晒秋台；如果 D4 到得晚，建议改成 D5 一早上去（但 D5 要赶 280 km 回南昌，时间会很紧）。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#ff3b30"><div class="d">D5</div><div class="n">6</div></div>
+      <div><h4>婺源 → 南昌 → 广州</h4><div class="meta">10 月 6 日 · 返程（全程最需卡时间的一天）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>婺源晨景</b><small>时间够可加月亮湾，就在县城附近</small></div></div>
+        <div class="row t"><div class="tm">08:30</div><div class="tx"><b>婺源 → 南昌</b><small>约 280 km，3.5 小时，中途服务区补油/补电</small></div></div>
+        <div class="row c"><div class="tm">12:00</div><div class="tx"><b>抵南昌西站，还车</b><small>加满油/充满电再还；留足 1 小时缓冲</small></div></div>
+        <div class="row f"><div class="tm">13:00</div><div class="tx"><b>站内午餐</b><small>南昌西站商业区解决</small></div></div>
+        <div class="row t"><div class="tm">14:30</div><div class="tx"><b>南昌西 → 广州南（高铁）</b><small>约 3 小时 40 分，二等座约 ¥500–540</small></div></div>
+        <div class="row"><div class="tm">18:10</div><div class="tx"><b>抵广州南</b><small>返程高峰，提前到站</small></div></div>
+      </div>
+      <div class="callout danger" style="margin-bottom:0"><b>D5 时间要卡紧：</b>婺源到南昌 280 km、3.5 小时，国庆高速车多，务必 <b>08:30 前出发</b>。还车 + 高铁安检至少留 2 小时，<b>返程高铁别订 14:00 前的班次</b>。若想更稳，可把返程订到 16:00 之后。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>吃在赣北</h2>
+  <p class="sub">这一趟集中在赣北，从南昌吃到婺源，口味偏鲜辣。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>城市</th><th>必吃</th><th>参考人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>南昌</b></td><td>南昌拌粉、瓦罐汤、藜蒿炒腊肉、白糖糕</td><td class="num">¥40–70</td></tr>
+        <tr><td><b>庐山</b></td><td>庐山石鸡、石鱼、庐山云雾茶；山上物价偏高</td><td class="num">¥80–120</td></tr>
+        <tr><td><b>景德镇</b></td><td>冷粉、碱水粑、饺子粑、瓷泥煨鸡</td><td class="num">¥30–60</td></tr>
+        <tr><td><b>婺源</b></td><td>粉蒸菜、婺源汽糕、糊豆腐、荷包红鲤鱼</td><td class="num">¥50–80</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">各地具体单店口碑本次未逐一检索核验，建议到店看本地人流量选择；景区内（庐山牯岭街、篁岭）餐饮溢价明显，正餐尽量安排在山下或县城。</p>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1（10/2）</td><td>南昌 红谷滩 / 滕王阁</td><td class="num">约 ¥300–450/间</td><td>步行可达滕王阁、万寿宫</td></tr>
+        <tr><td>D2（10/3）</td><td>庐山 牯岭镇</td><td class="num">约 ¥400–700/间</td><td><b>国庆最贵最紧</b>，是全程最大变量</td></tr>
+        <tr><td>D3（10/4）</td><td>景德镇 陶阳里 / 陶溪川</td><td class="num">约 ¥250–400/间</td><td>逛夜市方便</td></tr>
+        <tr><td>D4（10/5）</td><td>婺源 篁岭山下 / 县城</td><td class="num">约 ¥300–500/间</td><td>住山下可次日一早再上篁岭</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>预订提示：</b>庐山牯岭镇国庆房源是全趟最紧张的，订不到就改住<b>九江市区</b>，每天换乘上山——省下住宿费，代价是每天多花 1 小时换乘。婺源篁岭山下民宿也紧，建议和庐山一起先订。</div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>预算总表</h2>
+  <p class="sub">4 人、高铁往返 + 南昌同城租还车、5 天 4 晚。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（4 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>去程高铁</b></td><td>广州南 → 南昌西，¥500–540 × 4</td><td class="num">¥2,000–2,160</td><td class="num">¥500–540</td></tr>
+        <tr><td><b>返程高铁</b></td><td>南昌西 → 广州南，¥500–540 × 4</td><td class="num">¥2,000–2,160</td><td class="num">¥500–540</td></tr>
+        <tr><td><b>租车</b></td><td>5 天，经济型（国庆上浮）</td><td class="num">¥1,000–2,000</td><td class="num">¥250–500</td></tr>
+        <tr><td>异地还车费</td><td>南昌同城取还</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td>过路费</td><td>国庆免费（全程落在 10/1–10/7 窗口内）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td>油费</td><td>约 735 km，燃油车约 ¥0.6–0.7/km</td><td class="num">¥450–550</td><td class="num">¥115–140</td></tr>
+        <tr><td><b>住宿</b></td><td>2 间 × 4 晚（庐山 1 晚最贵）</td><td class="num">¥2,400–4,000</td><td class="num">¥600–1,000</td></tr>
+        <tr><td>餐饮</td><td>人均 ¥100–150/天 × 5 天 × 4 人</td><td class="num">¥2,000–3,000</td><td class="num">¥500–750</td></tr>
+        <tr><td>门票</td><td>滕王阁 ¥50 + 庐山 ¥160 + 观光车 ¥90 + 陶阳里 ¥50 + 篁岭 ¥145 ≈ ¥495/人（三叠泉 ¥64 可选）</td><td class="num">¥1,980–2,236</td><td class="num">¥495–559</td></tr>
+        <tr><td>停车杂费</td><td>庐山山脚停车、各景区停车</td><td class="num">¥250–400</td><td class="num">¥65–100</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥1.21–1.65 万</td><td class="num hi">约 ¥3,000–4,100</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>最大的一项是高铁：</b>往返共约 ¥4,000–4,320（4 人），占了总预算的三分之一。这也是"高铁往返"的代价——省了体力，但票钱比自驾的电费/油费高得多。人越多，自驾越划算；2 人出行则这个方案更合适。
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>庐山改住九江市区，不住牯岭</td><td class="num ok">省 ¥400–800</td></tr>
+        <tr><td>砍掉古窑民俗博览区（¥95/人）</td><td class="num ok">省 ¥380</td></tr>
+        <tr><td>高铁二等座提前抢，避免临时买一等座</td><td class="num ok">省 ¥600–1,000</td></tr>
+        <tr><td>换成纯电租车，油费改电费</td><td class="num ok">省 ¥150–250</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="n">8</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">高铁与租车</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>广州南 ⇄ 南昌西双向都是国庆热门，<b>开售即订或候补</b></li>
+        <li>返程 10/6 仍在假期内，票比想象中紧</li>
+        <li>南昌同城取还，<b>确认无异地还车费</b></li>
+        <li>确认租车套餐有无<b>日里程限制</b>（本程约 735 km）</li>
+        <li>D5 还车留 1 小时缓冲，还车前加满油/充满电</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">庐山换乘</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/1–10/7 核心景区<b>强制换乘</b>，车停南/北门换乘中心或索道停车场</li>
+        <li>观光车 ¥90（含上下山 + 山上），运营 <b>7:30–18:30</b></li>
+        <li>山脚停车约 ¥20/天</li>
+        <li>山上住宿紧、充电桩少，电要在九江市区补满</li>
+        <li>山上比山下低 5–8℃，早晚必须加外套</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">预约与限流</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>庐山门票 + 观光车<b>提前预约</b></li>
+        <li>婺源篁岭晒秋季限流，门票 + 索道约 ¥145，需预约</li>
+        <li>滕王阁需预约</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">时间与路况</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>D5 婺源 → 南昌 280 km、3.5 小时，<b>08:30 前必须出发</b></li>
+        <li>返程高铁别订 14:00 前的班次，留足还车 + 安检时间</li>
+        <li>D1（10/2）和 D5（10/6）高铁站人最多</li>
+        <li>山区多雾，庐山早晚能见度低，注意行车</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  庐山国庆交通换乘公告 · <a href="https://tt.jxnews.com.cn/news/2892250" target="_blank">江西新闻网</a><br>
+  婺源篁岭晒秋攻略 · <a href="http://www.jxwy.gov.cn/jxwy/lyxd/202011/74247b23f9d54b21bcf710b8bae5bf67.shtml" target="_blank">婺源县人民政府</a><br>
+  南昌 ⇄ 婺源自驾里程 · <a href="http://cha.zuzuche.com/lu/nanchang/1340.html" target="_blank">自驾路线查询</a><br>
+  庐山 ⇄ 景德镇里程 · <a href="https://m.mafengwo.cn/gl/detail.php?id=18634&mddid=10244" target="_blank">马蜂窝</a><br>
+  广州 → 南昌高铁票价与时刻 · <a href="https://trains.ctrip.com/trainbooking/guangzhou-nanchang/" target="_blank">携程火车票</a><br>
+  神州租车 · 南昌西站网点 · <a href="https://service.zuche.com/dept/detail.do?deptId=2068" target="_blank">zuche.com</a><br>
+  一嗨租车 · 南昌西站店 · <a href="https://m.map.360.cn/m/search/map_list/keyword=%E5%8D%97%E6%98%8C%E9%AB%98%E9%93%81%E8%A5%BF%E5%AE%A2%E7%AB%99" target="_blank">360 地图</a>
+  <p style="margin-top:14px">里程、票价、班次、限流规则均为 2026 年 9 月 30 日检索口径，国庆期间浮动较大。<b>高铁票额、租车库存与景区预约名额请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 广州→南昌', color:'#007aff', pts:[
+    {n:'广州南站',city:'广州',lat:22.9895,lng:113.2680,t:'transport',d:'高铁出发，约 3h40m 到南昌西'},
+    {n:'南昌西站',city:'南昌',lat:28.6486,lng:115.8009,t:'transport',d:'站内取车：南广场负二层 W 区（神州 24h）'},
+    {n:'滕王阁',city:'南昌',lat:28.6810,lng:115.8790,t:'spot',d:'门票约 ¥50，需预约'},
+    {n:'万寿宫历史文化街区',city:'南昌',lat:28.6790,lng:115.8880,t:'spot',d:'免费，老南昌街区'},
+    {n:'八一广场',city:'南昌',lat:28.6800,lng:115.9000,t:'spot',d:'城市地标'}
+  ]},
+  d2:{label:'D2 南昌→庐山', color:'#af52de', pts:[
+    {n:'庐山北门换乘中心',city:'庐山',lat:29.6050,lng:115.9920,t:'transport',d:'国庆强制换乘，车停这里约 ¥20/天'},
+    {n:'牯岭镇',city:'庐山',lat:29.5580,lng:115.9820,t:'hotel',d:'山上住宿，国庆最贵最紧'},
+    {n:'花径 · 如琴湖',city:'庐山',lat:29.5640,lng:115.9760,t:'spot',d:'白居易咏桃花处'},
+    {n:'美庐别墅',city:'庐山',lat:29.5620,lng:115.9820,t:'spot',d:'近代史现场'}
+  ]},
+  d3:{label:'D3 庐山→景德镇', color:'#ff9500', pts:[
+    {n:'含鄱口',city:'庐山',lat:29.5360,lng:116.0020,t:'spot',d:'看日出，需早起'},
+    {n:'五老峰',city:'庐山',lat:29.5480,lng:116.0270,t:'spot',d:'登顶约 2–3 小时'},
+    {n:'牯岭镇',city:'庐山',lat:29.5580,lng:115.9820,t:'transport',d:'换乘下山取车'},
+    {n:'陶阳里御窑厂',city:'景德镇',lat:29.2960,lng:117.2000,t:'spot',d:'门票约 ¥50，明清御窑遗址'},
+    {n:'景德镇市区',city:'景德镇',lat:29.2900,lng:117.1900,t:'hotel',d:'住陶阳里或陶溪川附近'}
+  ]},
+  d4:{label:'D4 景德镇→婺源', color:'#34c759', pts:[
+    {n:'古窑民俗博览区',city:'景德镇',lat:29.2760,lng:117.1840,t:'spot',d:'门票约 ¥95，看制瓷全流程'},
+    {n:'婺源篁岭',city:'婺源',lat:29.1980,lng:117.9130,t:'spot',d:'门票+索道约 ¥145，晒秋正季'},
+    {n:'婺源县城',city:'婺源',lat:29.2480,lng:117.8610,t:'hotel',d:'或住篁岭山下'}
+  ]},
+  d5:{label:'D5 婺源→南昌→广州', color:'#ff3b30', pts:[
+    {n:'婺源县城',city:'婺源',lat:29.2480,lng:117.8610,t:'transport',d:'08:30 前出发，约 280 km 回南昌'},
+    {n:'南昌西站',city:'南昌',lat:28.6486,lng:115.8009,t:'transport',d:'同城还车，留 1 小时缓冲'},
+    {n:'广州南站',city:'广州',lat:22.9895,lng:113.2680,t:'transport',d:'高铁约 3h40m 返抵'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[28.9,116.4],zoom:7,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>

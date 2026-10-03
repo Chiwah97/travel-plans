@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 台山 · 3天2夜海边自驾方案（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 10/5–10/7 佛山出发 3天2夜自驾江门台山海岸线：那琴半岛地质海洋公园 + 浪琴湾 + 铜鼓黑沙湾 + 广海湾，含路线充电、逐日行程、海鲜美食与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线充电</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">吃在台山</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 10/5 – 10/7 · 江门台山海岸线</div>
+  <h1>佛山 ⇄ 台山 3 天 2 夜</h1>
+  <p>纯电自驾 · 那琴半岛地质海洋公园 · 浪琴湾 · 铜鼓黑沙湾 · 广海湾</p>
+  <div class="tags">
+    <span>单程约 190 km</span><span>纯电全程约 480 km</span>
+    <span>2 人 1 车</span><span>人均 ¥1,000–2,000</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>这一版怎么定的</h2>
+  <p class="sub">3 天 2 夜、不上岛，走台山岸线：<b>那琴半岛 + 浪琴湾 + 黑沙湾 + 广海湾</b>，一路沿海南进、再返程收口。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>日期</th><th>天气</th><th>安排</th><th>住宿</th></tr></thead>
+      <tbody>
+        <tr><td><b>D1 · 10/5</b></td><td><span class="pill g">多云 22–29℃</span></td><td>佛山 → 那琴半岛（全程驾驶日）→ 浪琴湾看日落</td><td>那琴半岛景区</td></tr>
+        <tr><td><b>D2 · 10/6</b></td><td><span class="pill g">多云 22–29℃</span></td><td>那琴半岛环岛栈道 → 转铜鼓，黑沙湾玩水</td><td>铜鼓 / 广海湾</td></tr>
+        <tr><td><b>D3 · 10/7</b></td><td><span class="pill g">多云 21–29℃</span></td><td>海角城晨景 → 都斛海鲜街 → 返程佛山</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>三处关键取舍：</b>①<b>不走海岛</b>——上川/下川岛要轮渡 + 车渡票紧张 + 受台风影响大，岸线车直达、容错高，更适合 3 天短假。②<b>那琴半岛住 1 晚</b>——它是台山岸线头牌，住景区酒店可"无限次入园"，傍晚和清晨人最少、光线最好；国庆景区房部分已满房，<b>今天就得订</b>。③<b>返程卡时间</b>——10/7 是免费最后一天 + 返程高峰，D3 上午玩完 11:30 前上高速，避开 15:00–21:00 高峰。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">路线设计</div>
+      <div class="v">一路沿海南进</div>
+      <div class="d">佛山 → 那琴半岛 → 黑沙湾 → 广海湾 → 都斛 → 佛山。景点全部沿海排布，按"南进北返"一条线走完，不折返。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">天气窗口</div>
+      <div class="v">多云 21–29℃</div>
+      <div class="d">10/5–10/7 全程多云、无强降雨，适合海边；10 月仍有台风风险，出发前留意预警。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">最紧张环节</div>
+      <div class="v">那琴半岛住宿</div>
+      <div class="d">景区酒店国庆 512–1,550 元/晚起，部分高配房已满房；建议订含门票的套餐，最划算。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">核心约束</div>
+      <div class="v">返程 11:30 前</div>
+      <div class="d">10/7 高速免费最后一天、返程高峰集中在 15:00–21:00，D3 务必中午前上高速。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。那琴半岛住宿是头号任务——国庆景区房紧。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订那琴半岛住宿（D1，含门票套餐优先）</div><div class="m">景区海景酒店 512 元/晚起、别墅 1,550 元起；"2 天 1 晚含早餐 + 无限次地质海洋公园票"套餐约 575 元起。<b>部分高配房已满房，今天订。</b></div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订铜鼓 / 广海湾住宿（D2）</div><div class="m">黑沙湾海景度假酒店约 ¥174 起、海角城周边约 ¥294 起。选择有限但比那琴宽松，尽量订海景房看日出。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查那琴半岛门票预约</div><div class="m">成人票约 ¥120（第三方 ¥93 起），部分票种次日票最迟当天 06:00 前买；通过"那琴半岛"公众号确认预约。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">确认潮汐与下海时段</div><div class="m">10/5 小潮死汛、潮差小，适合海边散步；下海游泳以景区公告为准（黑沙湾游泳时段 08:00–18:30）。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">纯电补能规划</div><div class="m">佛山→那琴约 190 km，<b>满电出发可直达</b>；沿途备选址山服务区（42 桩、480kW 超充）、黄茅海服务区（40 桩）。那琴半岛酒店有直流桩。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备防晒与薄外套</div><div class="m">海边紫外线强、早晚风大，温度 21–29℃；下海备泳具，礁石区穿防滑鞋。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">确认台风/阵风预警</div><div class="m">10 月预计有 1–2 个台风影响我国沿海，出发前 1 天查"台风路径图"，有预警则改期。</div></div><span class="due p2">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线与充电</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>去程</td><td>佛山 → 沈海高速 → 西部沿海高速 → 北陡出口 → G228 → <b>那琴半岛</b>，约 190 km</td></tr>
+        <tr><td>转场</td><td>那琴半岛 → 浪琴湾（约 3 km）→ 铜鼓黑沙湾（约 55 km）→ 海角城/广海湾（约 40 km）</td></tr>
+        <tr><td>返程</td><td>都斛海鲜街 → 西部沿海高速 → 佛山，约 160–180 km</td></tr>
+        <tr><td>全程里程</td><td class="num">约 480 km（往返 + 当地）</td></tr>
+        <tr><td>过路费</td><td><b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下），全程落在免费窗口内</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>纯电补能点</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>位置</th><th>充电设施</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>佛开高速 · 址山服务区</td><td class="num">42 个桩位，含 480kW 超充（5–10 分钟补能）</td><td><span class="pill g">首选</span> 出城后路过可补</td></tr>
+        <tr><td>西部沿海高速 · 黄茅海服务区</td><td class="num">40 个充电桩，一级服务区</td><td><span class="pill g">首选</span> 往返均顺路</td></tr>
+        <tr><td>西部沿海高速 · 上川服务区</td><td class="num">20 个充电车位</td><td><span class="pill o">备选</span> 离那琴较近</td></tr>
+        <tr><td>那琴半岛景区酒店</td><td class="num">有直流充电车位</td><td><span class="pill g">方便</span> 住景区时补</td></tr>
+        <tr><td>北陡镇</td><td class="num">那琴馆/四季容咖啡馆站内有充电站</td><td><span class="pill o">备选</span> 镇上也能补</td></tr>
+        <tr><td>台山市区</td><td class="num">台山公用集团：600kW 液冷超充 + 300kW 快充</td><td><span class="pill b">兜底</span> 返程前可补满</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>纯电节奏建议：</b>佛山→那琴仅约 190 km，<b>满电出发即可直达，途中基本无需排队补能</b>；进那琴后利用酒店直流桩补一次，返程在黄茅海或台山市区再补即够。全程约 480 km，按快充 ¥1.3–1.8/kWh、电耗约 15 kWh/100km 估算，电费约 ¥100–130。<b>和去外省不同，这趟的充电压力很小，最大的变量是国庆高速车流。</b>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天赶路 + 一天那琴 + 一天黑沙湾与返程。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">5</div></div>
+      <div><h4>佛山 → 那琴半岛 + 浪琴湾</h4><div class="meta">10 月 5 日 · 多云 · 约 190 km / 3h</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">09:00</div><div class="tx"><b>佛山出发</b><small>满电出发，走沈海高速 → 西部沿海高速，避开出城高峰</small></div></div>
+        <div class="row c"><div class="tm">10:30</div><div class="tx"><b>黄茅海服务区小憩</b><small>40 桩；车多则直接走，续航足够</small></div></div>
+        <div class="row"><div class="tm">12:00</div><div class="tx"><b>北陡镇午餐</b><small>下高速后 G228 沿线解决，先到先吃</small></div></div>
+        <div class="row h"><div class="tm">13:00</div><div class="tx"><b>抵那琴半岛，入住景区酒店</b><small>房费常含门票；放好行李再入园</small></div></div>
+        <div class="row f"><div class="tm">14:00</div><div class="tx"><b>那琴半岛地质海洋公园</b><small>环岛栈道 + 婚纱摄影基地；门票约 ¥120，下午光线好、人相对少</small></div></div>
+        <div class="row f"><div class="tm">17:30</div><div class="tx"><b>浪琴湾看日落</b><small>仅 3 km、5–10 分钟；门票约 ¥14，看礁石与归航渔船</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>晚餐：黄鳝饭 + 生蚝</b><small>北陡/浪琴湾一带，台山黄鳝饭是招牌</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>D1 节奏很松：</b>3 小时车程，下午就入园，晚上在景区酒店过夜——第二天的清晨栈道几乎没人，是那琴半岛最出片的时候。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">6</div></div>
+      <div><h4>那琴半岛晨景 → 铜鼓黑沙湾</h4><div class="meta">10 月 6 日 · 多云 · 那琴 → 黑沙湾约 55 km / 1h</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">06:30</div><div class="tx"><b>那琴半岛清晨栈道</b><small>住店可无限次入园，清晨人最少；顺路看海上日出</small></div></div>
+        <div class="row"><div class="tm">08:30</div><div class="tx"><b>早餐 + 退房</b><small>酒店含早则直接在店里吃</small></div></div>
+        <div class="row t"><div class="tm">10:00</div><div class="tx"><b>那琴 → 铜鼓黑沙湾</b><small>约 55 km / 1h，走西部沿海高速 + 县道</small></div></div>
+        <div class="row h"><div class="tm">11:00</div><div class="tx"><b>入住铜鼓/广海湾酒店</b><small>黑沙湾海景酒店约 ¥174 起</small></div></div>
+        <div class="row"><div class="tm">12:00</div><div class="tx"><b>午餐：海鲜大排档</b><small>铜鼓镇上解决</small></div></div>
+        <div class="row f"><div class="tm">14:00</div><div class="tx"><b>铜鼓黑沙湾</b><small>门票约 ¥30；世界罕有黑色沙滩、1.5 km 长，游泳时段 08:00–18:30，可下海</small></div></div>
+        <div class="row f"><div class="tm">18:00</div><div class="tx"><b>广海湾 / 海角城看海</b><small>傍晚风大带外套；海角城另有古舟岛体验票 ¥80 起，可自选</small></div></div>
+        <div class="row f"><div class="tm">19:30</div><div class="tx"><b>晚餐：广海咸鱼 + 狗仔鹅</b><small>广海湾一带特色，选本地人多的店</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>黑沙湾是这趟唯一能下水的地方：</b>游泳时段 08:00–18:30，下海务必在此时段内、并注意救生员示意。<b>10/5 是小潮死汛、潮差小</b>，岸边玩水安全；礁石区（那琴、浪琴湾）只可远观，别爬礁石。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D3</div><div class="n">7</div></div>
+      <div><h4>海角城晨景 → 都斛海鲜街 → 返程</h4><div class="meta">10 月 7 日 · 多云 · 返程约 160–180 km / 2.5h</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:00</div><div class="tx"><b>海角城 / 广海湾晨景</b><small>人少清净，看完直接出发</small></div></div>
+        <div class="row t"><div class="tm">08:00</div><div class="tx"><b>铜鼓 → 都斛海鲜街</b><small>约 40 km / 1h，返程顺路</small></div></div>
+        <div class="row f"><div class="tm">09:00</div><div class="tx"><b>都斛海鲜街</b><small>生蚝、奄仔蟹出名；市场采购 → 周边大排档加工，主打"多、廉、鲜"</small></div></div>
+        <div class="row"><div class="tm">11:00</div><div class="tx"><b>午餐：现买现加工</b><small>吃完顺路采购干货带回家</small></div></div>
+        <div class="row c"><div class="tm">11:30</div><div class="tx"><b>上高速返程</b><small>西部沿海高速 → 佛山，约 160–180 km / 2.5h</small></div></div>
+        <div class="row"><div class="tm">14:00</div><div class="tx"><b>抵佛山</b><small>11:30 前上高速，赶在 15:00 返程高峰之前</small></div></div>
+      </div>
+      <div class="callout danger" style="margin-bottom:0"><b>D3 是全程最需要卡时间的一天：</b>10/7 是高速免费最后一天，返程高峰集中在 15:00–21:00。<b>都斛午餐宜快（11:00 前吃完），11:30 前必须上高速</b>；若想多买海鲜，可接受晚些出发，但会撞上高峰，行程多 1 小时起步。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>时间富余时的加项：</b>那琴半岛返程方向可加<b>梅家大院</b>（《让子弹飞》取景地，免费看外观）或<b>海口埠银信文化古街</b>（免费，侨乡银信文化），都在台山市内、不算绕路。若 D3 不想赶，可放弃都斛，直接返程。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>吃在台山</h2>
+  <p class="sub">台山靠海吃海，生蚝、黄鳝饭、咸鱼是招牌。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>地点</th><th>必吃</th><th>参考人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>北陡 / 浪琴湾</b></td><td>台山黄鳝饭（浪琴湾一带多家）、生蚝、滨海渔村海鲜</td><td class="num">¥60–120</td></tr>
+        <tr><td><b>铜鼓 / 广海湾</b></td><td>广海咸鱼、狗仔鹅、大排档海鲜</td><td class="num">¥60–120</td></tr>
+        <tr><td><b>都斛海鲜街</b></td><td>生蚝、奄仔蟹；市场采购 + 大排档加工，"多、廉、鲜"</td><td class="num">¥80–150</td></tr>
+        <tr><td>其他</td><td>五味鹅、台山钵仔糕（可当伴手礼）</td><td class="num">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">具体单店口碑本次未逐一核验，建议到店看本地人流量选择；都斛海鲜街是采购 + 加工最划算的一站，放在返程日顺路吃。</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1（10/5）</td><td>那琴半岛景区酒店</td><td class="num">约 ¥512–1,550/间</td><td><b>全程最紧</b>；海景房 512 起、别墅 1,550 起；"2 天 1 晚含早 + 无限次入园"套餐约 575 起。部分高配房已满房</td></tr>
+        <tr><td>D2（10/6）</td><td>铜鼓 / 广海湾</td><td class="num">约 ¥174–520/间</td><td>黑沙湾海景度假酒店 174 起、海景露台 518 起；海角城周边约 294 起。选择有限但相对宽松</td></tr>
+        <tr><td>备选</td><td>台山市区（台城）</td><td class="num">约 ¥283–377/间</td><td>返程前一晚若想进城，天诚港、丽怡等方便自驾停车</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>预订提示：</b>那琴半岛是全国庆最紧张的区域，<b>优先订它、且优先选含门票套餐</b>（省下 2 张门票约 ¥240）。铜鼓那晚可选海景房看日出，或保守选基础房省钱；两晚最好今天一起订掉。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">2 人 1 车、纯电、3 天 2 夜。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（2 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>充电</b></td><td>全程约 480 km，快充 ¥1.3–1.8/kWh、电耗约 15 kWh/100km</td><td class="num">¥100–130</td><td class="num">¥50–65</td></tr>
+        <tr><td>过路费</td><td>国庆免费（10/1–10/7，7 座及以下）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td><b>住宿</b></td><td>1 间 × 2 晚（那琴半岛 1 晚 + 铜鼓 1 晚）</td><td class="num">¥700–2,070</td><td class="num">¥350–1,035</td></tr>
+        <tr><td>餐饮</td><td>2 人 × 3 天 × ¥120–180/人/天</td><td class="num">¥720–1,080</td><td class="num">¥360–540</td></tr>
+        <tr><td>门票</td><td>那琴半岛约 ¥120×2（住含票套餐则省）+ 浪琴湾 ¥14×2 + 黑沙湾 ¥30×2</td><td class="num">¥330–560</td><td class="num">¥165–280</td></tr>
+        <tr><td>停车杂费</td><td>景区停车、观光车（那琴约 ¥10/人/程）等</td><td class="num">¥100–200</td><td class="num">¥50–100</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥1,950–4,040</td><td class="num hi">约 ¥975–2,020</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>开销弹性全在住宿：</b>那琴一晚 512 起 vs 别墅 1,550，差价近千；铜鼓一晚 174 起 vs 海景 520。全走性价比（含票套餐 + 基础房）人均可压到 ¥1,000 出头；要海景度假体验则奔 ¥2,000。
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>订那琴"含门票套餐"而非单买门票 + 单订房</td><td class="num ok">省约 ¥240（2 人门票）</td></tr>
+        <tr><td>铜鼓选基础海景/山景房，不追海景露台</td><td class="num ok">省 ¥200–350</td></tr>
+        <tr><td>都斛市场采购 + 大排档加工，替代景区内正餐</td><td class="num ok">省 ¥100–200</td></tr>
+        <tr><td>全程满电出发、少在服务区排队补能</td><td class="num ok">省 ¥30–50</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">住宿与门票</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>那琴半岛景区房国庆紧，<b>部分房型已满房，今天订</b></li>
+        <li>那琴门票约 ¥120，第三方平台约 ¥93 起；部分票种次日票最迟当天 06:00 前买</li>
+        <li>景区观光车约 ¥10/人/程，别墅区客人免费</li>
+        <li>景区停车约 ¥5/小时、约 200 库位，早去早停</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">海边安全</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>黑沙湾游泳时段 08:00–18:30，其余时间别下海</li>
+        <li>那琴/浪琴湾是礁石海岸，<b>别爬礁石、注意浪袭</b></li>
+        <li>10/5 小潮死汛、潮差小，岸边安全；仍以景区公告为准</li>
+        <li>10 月有台风风险，出发前查台风路径，有预警即改期</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">返程与路况</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/7 返程高峰 15:00–21:00，<b>D3 上午 11:30 前上高速</b></li>
+        <li>易堵点：佛开高速司前至共和、西部沿海沙栏至山咀隧道</li>
+        <li>免费以<b>驶离收费站时间</b>为准，别卡 24:00 边界</li>
+        <li>返程高峰期服务区加油/充电排队，提前加满</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">其他</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>海边紫外线强，防晒霜 + 帽子必备</li>
+        <li>早晚风大，带薄外套</li>
+        <li>五丰村（东南亚风情侨村）免费但需电话预约</li>
+        <li>梅家大院仅外观免费，别期待可入内参观</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  那琴半岛地质海洋公园 · 门票与开放 · <a href="https://www.naqinhotel.cn/phone/spots/show_1.html" target="_blank">naqinhotel.cn</a><br>
+  那琴半岛酒店与套餐价格 · <a href="https://www.naqinhotel.cn/phone/" target="_blank">naqinhotel.cn</a><br>
+  浪琴湾 · 门票与开放 · <a href="http://m.taishan.bendibao.com/jingdian/langqingwan/" target="_blank">本地宝</a><br>
+  铜鼓黑沙湾 · 门票与游泳时段 · <a href="https://m.jm.bendibao.com/jingdian/heishawancidej/" target="_blank">本地宝</a><br>
+  江门文旅 · 黑沙湾介绍 · <a href="https://www.jiangmen.gov.cn/bmpd/jmswhgdlytyj/zwgk/zdlyxxgk/ggwhtyxxgk/fwbzxx/content/post_3328861.html" target="_blank">jiangmen.gov.cn</a><br>
+  黄茅海服务区充电 · <a href="http://www.cnts.gov.cn/tssrmzf/tsyw/tskx/content/post_3461265.html" target="_blank">台山市政府</a><br>
+  江门交警 · 国庆避堵 · <a href="https://www.jiangmen.gov.cn/home/bmdt/content/post_3561321.html" target="_blank">jiangmen.gov.cn</a><br>
+  台山 10 月天气 · <a href="https://www.qweather.com/weather30d/taishan-101281106.html" target="_blank">和风天气</a>
+  <p style="margin-top:14px">里程、票价、限流规则均为 2026 年 10 月 3 日检索口径，国庆期间浮动较大。<b>住宿余房、门票预约、潮汐与台风预警请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→那琴半岛', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'09:00 出发，走沈海+西部沿海高速'},
+    {n:'黄茅海服务区',city:'台山',lat:22.0200,lng:112.9200,t:'charge',d:'40 桩；续航够可不补'},
+    {n:'北陡镇（午餐）',city:'台山',lat:21.7800,lng:112.2000,t:'food',d:'G228 沿线，先到先吃'},
+    {n:'那琴半岛地质海洋公园',city:'台山',lat:21.7700,lng:112.1500,t:'spot',d:'门票约 ¥120，环岛栈道+婚纱基地'},
+    {n:'浪琴湾',city:'台山',lat:21.7900,lng:112.1900,t:'spot',d:'门票约 ¥14，看日落'}
+  ]},
+  d2:{label:'D2 那琴→黑沙湾', color:'#af52de', pts:[
+    {n:'那琴半岛（清晨）',city:'台山',lat:21.7700,lng:112.1500,t:'spot',d:'06:30 清晨栈道，人最少'},
+    {n:'铜鼓黑沙湾',city:'台山',lat:21.8700,lng:112.3600,t:'spot',d:'门票约 ¥30，黑色沙滩 1.5km'},
+    {n:'广海湾 / 海角城',city:'台山',lat:21.8400,lng:112.3000,t:'spot',d:'傍晚看海；古舟岛体验票 ¥80 起'}
+  ]},
+  d3:{label:'D3 都斛→佛山', color:'#34c759', pts:[
+    {n:'海角城晨景',city:'台山',lat:21.8400,lng:112.3000,t:'spot',d:'07:00 人少清净'},
+    {n:'都斛海鲜街',city:'台山',lat:21.9800,lng:112.4200,t:'food',d:'生蚝、奄仔蟹，采购+加工'},
+    {n:'佛山',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'11:30 前上高速，约 2.5h 返抵'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[22.2,112.7],zoom:8,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>
