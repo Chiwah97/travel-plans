@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 珠海·澳门 · 3天2夜攻略（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 10/4–10/6 佛山出发 3天2夜珠海+澳门攻略：情侣路日月贝、横琴口岸过关、澳门一日游、长隆海洋王国，含通关签注、停车充电、逐日行程与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线通关</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">吃在珠澳</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 10/4 – 10/6 · 珠海 + 澳门</div>
+  <h1>佛山 ⇄ 珠海·澳门 3 天 2 夜</h1>
+  <p>纯电自驾 + 港澳一日 · 情侣路日月贝 · 横琴口岸过关 · 大三巴官也街 · 长隆海洋王国</p>
+  <div class="tags">
+    <span>单程约 150 km</span><span>横琴口岸 24 小时</span>
+    <span>车停珠海不过关</span><span>2 人 1 车</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>这一版怎么定的</h2>
+  <p class="sub">珠澳联游的关键不是路程，是<b>证件（港澳通行证 + 澳门签注）和口岸选择</b>。车停珠海、人过关，是最省心的组合。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>日期</th><th>天气</th><th>安排</th><th>住宿</th></tr></thead>
+      <tbody>
+        <tr><td><b>D1 · 10/4</b></td><td><span class="pill o">阵雨 25–30℃</span></td><td>佛山 → 珠海情侣路（日月贝/渔女）→ 横琴</td><td>珠海横琴</td></tr>
+        <tr><td><b>D2 · 10/5</b></td><td><span class="pill b">多云 23–29℃</span></td><td>横琴口岸过关 → 澳门一日（氹仔 + 半岛）→ 返横琴</td><td>珠海横琴</td></tr>
+        <tr><td><b>D3 · 10/6</b></td><td><span class="pill g">多云转晴 22–28℃</span></td><td>长隆海洋王国 → 取车返程佛山</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>四处关键取舍：</b>①<b>证件是硬门槛</b>——赴澳门需<b>港澳通行证 + 澳门签注</b>，个人旅游（G）签注<b>每次仅一次有效</b>、每次逗留不超过 7 天，务必出发前确认签注在有效期内且未用过。②<b>走横琴口岸</b>——24 小时通关，国庆日均约 11.6–12.5 万人次，比拱北（日均近 40 万）少一半以上，且过关即氹仔、紧邻长隆。③<b>车不过澳门</b>——内地私家车无粤澳两地牌不能开进澳门，车停横琴口岸停车场（24h 封顶仅 30 元）或酒店。④<b>D3 早走</b>——10/6 是返程高峰，建议 16:30 前离园上高速。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">交通设计</div>
+      <div class="v">车停珠海·人过关</div>
+      <div class="d">佛山 → 珠海约 150 km，车停横琴，步行过关；澳门内靠免费发财车 + 轻轨 + 公交。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">最硬门槛</div>
+      <div class="v">澳门签注</div>
+      <div class="d">通行证 + 澳门签注缺一不可，G 签每次仅一次有效、逗留≤7 天，先确认再订房。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">天气窗口</div>
+      <div class="v">前雨后转好</div>
+      <div class="d">10/4 阵雨、10/5 多云、10/6 多云转晴；4 日起冷空气降温 3–5℃，带薄外套。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">核心约束</div>
+      <div class="v">返程高峰</div>
+      <div class="d">10/6 下午起返程高峰，长隆虽 20:00 闭园，但要赶回家就得 16:30 前离园。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。第一项是硬门槛——没有有效澳门签注，整趟澳门行程都进不去。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">核对港澳通行证 + 澳门签注</div><div class="m"><b>硬门槛。</b>确认通行证在有效期内、澳门签注（个人旅游 G 签）有效且未使用；<b>赴澳门签注每次仅一次有效</b>，用掉就要重新申请。卡式证可走自助通道（首次需人工通道录指纹）。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订珠海横琴住宿（2 晚）</div><div class="m">横琴近口岸与长隆，免每天往返。国庆旺季，今天订；<b>优先选可免费取消的房型</b>，以备签注或天气变故。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订长隆海洋王国门票</div><div class="m">实行<b>实名制预订</b>，国庆成人票约 ¥395（标准票 ¥450），儿童/青少年/老人约 ¥280–315。官方渠道或 OTA 预订，出行带身份证。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查横琴口岸停车与充电</div><div class="m">横琴口岸周边停车场 30 分钟免费、小车 1.5 元/30 分钟、24h 封顶 30 元；口岸 B2 停车场有南方电网充电站（最高 120kW）。横琴出行小程序可查空位。</div></div><span class="due p1">出发前 1 天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备少量澳门币现金</div><div class="m">澳门公交统一 6 澳门元、<b>不设找零</b>，需自备硬币；多数商户支持支付宝/微信。发财车（娱乐场免费穿梭巴士）免费乘坐。</div></div><span class="due p1">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">纯电补能规划</div><div class="m">佛山→珠海约 150 km，满电直达往返足够；备选横琴公共充电站（16 座站点/349 台桩，覆盖半径 &lt;1km）、横琴口岸 B2 站、长隆飞船乐园快充站。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查台风与降雨预警</div><div class="m">10 月仍有台风可能影响华南沿海；4 日起冷空气南下带来阵雨降温。出发前看路径图与预警，备雨具与薄外套。</div></div><span class="due p2">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线、通关与停车</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。澳门与海上路段为示意连线，标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>去程</td><td>佛山 → 广珠西线 / 广澳高速 → <b>珠海香洲（情侣路）</b> → 横琴，约 150 km / 2h</td></tr>
+        <tr><td>过关</td><td>车停横琴口岸停车场 / 酒店 → 步行过关 → 澳门氹仔（口岸连澳门轻轨「莲花站」）</td></tr>
+        <tr><td>返程</td><td>横琴 → 广珠西线 → 佛山，约 150 km / 2h</td></tr>
+        <tr><td>全程里程</td><td class="num">约 300 km（往返，车不过澳门）</td></tr>
+        <tr><td>过路费</td><td><b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下），以驶离收费站时间为准</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout danger">
+    <b>车不能开进澳门：</b>内地私家车（含新能源）除持有<b>粤澳两地牌</b>外，一律不能驶入澳门。因此本方案<b>车停在珠海横琴</b>，人步行过关，澳门境内用发财车 / 轻轨 / 公交。
+  </div>
+
+  <h3>通关口岸怎么选</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>口岸</th><th>开放时间</th><th>国庆日均客流</th><th>特点与建议</th></tr></thead>
+      <tbody>
+        <tr><td><b>横琴口岸</b></td><td class="num">24 小时</td><td class="num">约 11.6–12.5 万</td><td><span class="pill g">首选</span> 人流少、过关即氹仔、紧邻长隆，接澳门轻轨莲花站</td></tr>
+        <tr><td>青茂口岸</td><td class="num">24 小时</td><td class="num">约 11.8 万</td><td>24h，<b>仅限符合条件人员</b>通行</td></tr>
+        <tr><td>拱北 / 关闸口岸</td><td class="num">06:00 – 次日 01:00</td><td class="num">约 38.6–40.3 万</td><td>全国最繁忙陆路口岸，步行过关，离珠海市区近但极挤</td></tr>
+        <tr><td>港珠澳大桥珠海公路口岸</td><td class="num">步行 08:00–22:00</td><td class="num">约 10.4–12 万</td><td>可顺带看大桥；口岸停车场 5 元/h、封顶 200 元</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>停车与费用</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>停车场</th><th>标准</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>横琴口岸周边停车场</b></td><td class="num">30 分钟免费；小车 1.5 元/30 分钟，24h 封顶 30 元</td><td><span class="pill g">首选</span> 车位多、便宜，步行可达口岸</td></tr>
+        <tr><td>拱北口岸·观澳平台地下</td><td class="num">30 分钟免费；8 元/小时，封顶 120 元/天</td><td>802 个车位，离拱北口岸近</td></tr>
+        <tr><td>情侣路·海韵城 / 大剧院</td><td class="num">免费 30 分钟；平日 5 元/h，周末及法定节假日 10 元/h</td><td>游情侣路时停；野狸岛另有停车场</td></tr>
+        <tr><td>酒店停车场</td><td class="num">视酒店</td><td>建议停酒店，步行 / 打车去口岸，省口岸停车折腾</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>纯电补能点</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>位置</th><th>充电设施</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>横琴口岸公共充电站（B2 停车场）</td><td class="num">南方电网，最高 120kW</td><td><span class="pill g">首选</span> 停车过关时补电</td></tr>
+        <tr><td>横琴片区公共充电站</td><td class="num">16 座站点 / 349 台桩，覆盖半径 &lt;1km</td><td><span class="pill g">首选</span> 横琴兜底，密度高</td></tr>
+        <tr><td>长隆飞船乐园快充站</td><td class="num">南方电网快充</td><td><span class="pill b">顺路</span> 玩长隆时补</td></tr>
+        <tr><td>情侣路 / 香洲商圈</td><td class="num">市区公共桩</td><td><span class="pill o">备选</span> D1 游玩时补</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>纯电节奏建议：</b>佛山→珠海仅约 150 km，<b>满电出发、往返都够</b>。关键点是车要在横琴停放 2 天，<b>返程前把电留够</b>；可在横琴口岸 B2 站补一次。全程约 300 km，电费约 ¥70–90。<b>这趟真正的变量是证件、口岸和长隆排队，不是电。</b>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天珠海海岸线、一天澳门、一天长隆返程。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">4</div></div>
+      <div><h4>佛山 → 珠海情侣路 → 横琴</h4><div class="meta">10 月 4 日 · 阵雨 · 车程约 2h + 市内游玩</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:00</div><div class="tx"><b>佛山出发</b><small>满电出发，走广珠西线 / 广澳高速；早走避开出城车流</small></div></div>
+        <div class="row c"><div class="tm">09:00</div><div class="tx"><b>抵珠海香洲，停好车</b><small>情侣路一带；停海韵城 / 大剧院停车场</small></div></div>
+        <div class="row f"><div class="tm">09:30</div><div class="tx"><b>珠海大剧院「日月贝」+ 野狸岛</b><small>地标贝壳建筑；环岛绿道散步（电动车禁入）</small></div></div>
+        <div class="row f"><div class="tm">11:00</div><div class="tx"><b>珠海渔女</b><small>香炉湾，免费；8.7 米高花岗岩雕像，珠海城徽</small></div></div>
+        <div class="row f"><div class="tm">12:00</div><div class="tx"><b>午餐：香洲 / 吉大</b><small>海鲜或粤菜；雨天就近解决</small></div></div>
+        <div class="row f"><div class="tm">13:30</div><div class="tx"><b>海滨泳场 / 情侣路</b><small>海边散步骑行；雨大则改圆明新园（免费仿古园林）</small></div></div>
+        <div class="row h"><div class="tm">15:30</div><div class="tx"><b>驱车赴横琴，入住酒店</b><small>约 40 分钟；横琴近口岸与长隆</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>横琴天沐河 / 花海长廊</b><small>河畔步道，傍晚光线好；或长隆飞船乐园</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：横琴</b><small>励骏庞都广场 / 长隆一带餐饮</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>D1 有雨，行程留弹性：</b>10/4 阵雨，海边体验打折。<b>日月贝最佳时段是 16:00–21:00</b>（日落 + 灯光秀），若当天上午下雨，可把日月贝挪到傍晚或返程路过时补看。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">5</div></div>
+      <div><h4>横琴口岸 → 澳门一日游 → 返横琴</h4><div class="meta">10 月 5 日 · 多云 · 全天在澳门，步行 + 发财车 + 轻轨</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:30</div><div class="tx"><b>横琴口岸过关</b><small>24 小时通关；过关后左行约 60 米到 H1/H2 免费发财车等候区</small></div></div>
+        <div class="row c"><div class="tm">08:00</div><div class="tx"><b>乘发财车入氹仔</b><small>H2 开往新濠影汇 / 威尼斯人 / 巴黎人 / 伦敦人，约 15 分钟一班</small></div></div>
+        <div class="row f"><div class="tm">08:30</div><div class="tx"><b>官也街 + 龙环葡韵</b><small>早茶、手信；葡式建筑群，拍照好地方</small></div></div>
+        <div class="row f"><div class="tm">10:30</div><div class="tx"><b>威尼斯人 → 巴黎人 → 伦敦人</b><small>人造天空、贡多拉；埃菲尔铁塔、大本钟打卡</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>午餐：官也街</b><small>诚昌水蟹粥、大利来记猪扒包、木偶葡国菜</small></div></div>
+        <div class="row h"><div class="tm">14:00</div><div class="tx"><b>过半岛：大三巴牌坊</b><small>轻轨或发财车过海；牌坊 + 恋爱巷 + 大三巴街</small></div></div>
+        <div class="row f"><div class="tm">15:30</div><div class="tx"><b>议事亭前地 → 玫瑰圣母堂 → 新马路</b><small>老城核心步行区，边逛边吃</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>澳门旅游塔</b><small>观光层俯瞰全城，10:00–20:00；成人约 MOP 188–208</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：半岛</b><small>葡国菜 / 茶餐厅；玛嘉烈或安德鲁葡挞收尾</small></div></div>
+        <div class="row t"><div class="tm">20:00</div><div class="tx"><b>返横琴口岸</b><small>乘轻轨（莲花站→横琴站，约 2 分钟）或发财车回口岸，过关回珠海</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>澳门动线按「先氹仔后半岛」排：</b>横琴口岸过关就在氹仔，先把官也街、威尼斯人一带玩完，再过海去半岛看大三巴、议事亭前地，傍晚澳门塔，晚上原路返回，<b>不走回头路</b>。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D3</div><div class="n">6</div></div>
+      <div><h4>珠海长隆海洋王国 → 佛山</h4><div class="meta">10 月 6 日 · 多云转晴 · 返程（全程最需卡时间的一天）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:30</div><div class="tx"><b>早餐、退房</b><small>行李可寄存酒店或放车上</small></div></div>
+        <div class="row h"><div class="tm">09:00</div><div class="tx"><b>赴长隆海洋王国</b><small>横琴，10:00 开园；建议提前到，国庆排队久</small></div></div>
+        <div class="row f"><div class="tm">10:00</div><div class="tx"><b>长隆海洋王国</b><small>鲸鲨馆、海豚剧场、企鹅馆、鹦鹉过山车；实名制入园带身份证</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>园内午餐</b><small>园区餐饮偏贵，可自带部分零食</small></div></div>
+        <div class="row f"><div class="tm">16:30</div><div class="tx"><b>离园，取车</b><small>趁返程高峰前上高速；若想看晚间烟花汇演，需接受夜间返程</small></div></div>
+        <div class="row c"><div class="tm">17:00</div><div class="tx"><b>上高速返程</b><small>广珠西线 → 佛山，约 150 km / 2h</small></div></div>
+        <div class="row"><div class="tm">19:00</div><div class="tx"><b>抵佛山</b><small>比 20:00 后的夜间高峰更从容</small></div></div>
+      </div>
+      <div class="callout danger" style="margin-bottom:0"><b>D3 时间要卡紧：</b>10/6 是返程高峰日，广珠西线下午起车流大。<b>务必 16:30 前离园上高速</b>，才能稳稳在晚 7 点前到家；想玩到闭园看烟花，就要接受夜间返程的拥堵。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>两个可选加项：</b>①<b>港珠澳大桥游</b>——从珠海公路口岸出发，乘车登<b>蓝海豚岛</b>、穿海底隧道，约 140 分钟，<b>无需港澳签注</b>，成人约 ¥188；想加就放 D1 或 D3。②<b>不想去长隆</b>——D3 可换<b>淇澳岛红树林 / 圆明新园 / 唐家湾古镇</b>等免费轻量景点，午后早早返程，避开 10/6 高峰。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>吃在珠海·澳门</h2>
+  <p class="sub">珠海吃海鲜，澳门吃葡挞与猪扒包。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>地点</th><th>必吃</th><th>参考人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>澳门·官也街</b></td><td>诚昌水蟹粥、大利来记猪扒包、莫义记榴莲雪糕、葡国菜</td><td class="num">¥80–150</td></tr>
+        <tr><td><b>澳门·葡挞</b></td><td>安德鲁饼店、玛嘉烈蛋挞（焦糖酥皮，澳门招牌）</td><td class="num">¥10–20/个</td></tr>
+        <tr><td><b>澳门·半岛老城</b></td><td>议事亭前地周边茶餐厅、新马路手信（杏仁饼、肉干）</td><td class="num">¥60–120</td></tr>
+        <tr><td><b>珠海·香洲 / 吉大</b></td><td>海鲜大排档、粤菜；横琴励骏庞都广场餐饮</td><td class="num">¥70–150</td></tr>
+        <tr><td>珠海·湾仔海鲜街</td><td>海鲜加工，临澳门口岸，价格相对实惠</td><td class="num">¥80–150</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">澳门餐饮集中、选择多但热门店排队久，<b>官也街与议事亭前地一带建议错峰</b>；点海鲜先问价、确认是否按斤计价。澳门多数商户支持支付宝/微信，公交需自备 6 澳门元硬币。</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1、D2（10/4、10/5）</td><td>珠海 · 横琴</td><td class="num">约 ¥500–900/间/晚</td><td><b>首选</b>：紧邻横琴口岸与长隆，免每天跨区往返；国庆涨价明显，早订</td></tr>
+        <tr><td>备选</td><td>珠海 · 吉大 / 拱北</td><td class="num">约 ¥350–650/间/晚</td><td>离情侣路近、市区餐饮多；但离横琴口岸与长隆约 40 分钟车程</td></tr>
+        <tr><td>体验型</td><td>澳门 · 氹仔</td><td class="num">约 ¥800–2,000/间/晚</td><td>住澳门需换成 1 晚珠海 + 1 晚澳门；行李与过关更折腾，适合想夜游澳门者</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>住宿策略：</b>本方案<b>两晚都住横琴</b>，因为 D2 走横琴口岸、D3 玩长隆都在横琴，省去跨区与搬行李。若想体验澳门夜景，可改成「1 晚横琴 + 1 晚澳门」，但需多带行李过关，且澳门国庆房价高。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">2 人 1 车、纯电、车停横琴、含长隆门票、3 天 2 夜。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（2 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>充电</b></td><td>全程约 300 km，快充 ¥1.3–1.8/kWh、电耗约 15 kWh/100km</td><td class="num">¥70–90</td><td class="num">¥35–45</td></tr>
+        <tr><td>过路费</td><td>国庆免费（10/1–10/7，7 座及以下）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td>停车</td><td>横琴口岸 24h 封顶 30 元/天 × 2 天 + 情侣路停车</td><td class="num">¥60–100</td><td class="num">¥30–50</td></tr>
+        <tr><td><b>长隆海洋王国门票</b></td><td>国庆成人票约 ¥395/人（实名制）</td><td class="num">¥790</td><td class="num">¥395</td></tr>
+        <tr><td><b>住宿</b></td><td>1 间 × 2 晚（横琴）</td><td class="num">¥1,000–1,800</td><td class="num">¥500–900</td></tr>
+        <tr><td>餐饮</td><td>2 人 × 3 天 × ¥200–350/人/天（含澳门）</td><td class="num">¥1,200–2,100</td><td class="num">¥600–1,050</td></tr>
+        <tr><td>澳门市内交通 + 门票</td><td>发财车免费；公交/轻轨约 6 澳门元/程；澳门塔约 ¥128/人</td><td class="num">¥300–400</td><td class="num">¥150–200</td></tr>
+        <tr><td>杂费</td><td>零食、饮水、手信、雨具等</td><td class="num">¥100–200</td><td class="num">¥50–100</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥3,520–5,480</td><td class="num hi">约 ¥1,760–2,740</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>开销弹性在住宿和长隆：</b>横琴 500 起 vs 900，两晚差 800；长隆门票 2 人 ¥790 是固定大项，若 D3 改玩免费景点（圆明新园 / 淇澳岛），<b>人均可降约 ¥400</b>。全走性价比（市区酒店 + 免费景点 + 发财车出行）人均可压到 ¥1,400 以内。
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>澳门市内尽量坐免费发财车，少打车</td><td class="num ok">省 ¥100–200</td></tr>
+        <tr><td>车停横琴口岸（24h 封顶 30 元），而非景区高价停车场</td><td class="num ok">省 ¥100–200</td></tr>
+        <tr><td>D3 用免费景点替代长隆</td><td class="num ok">省 ¥790</td></tr>
+        <tr><td>住横琴非一线 / 市区酒店</td><td class="num ok">省 ¥200–400</td></tr>
+        <tr><td>澳门餐饮去官也街大排档，避开酒店餐厅</td><td class="num ok">省 ¥150–300</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">证件与通关</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>赴澳门需<b>港澳通行证 + 澳门签注</b>，缺一不可</li>
+        <li>G 签<b>每次仅一次有效</b>、逗留≤7 天，用掉需重办</li>
+        <li>卡式证可走自助通道，首次需人工录指纹</li>
+        <li>优先走<b>横琴口岸</b>（24h、人少）；拱北国庆日均近 40 万人次</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">自驾与停车</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>内地车<b>不能开进澳门</b>（除非粤澳两地牌），车停珠海</li>
+        <li>横琴口岸周边停车 24h 封顶 30 元，性价比最高</li>
+        <li>情侣路停车：日月贝/海韵城节假日常 10 元/h</li>
+        <li>返程前把电留够，横琴口岸 B2 站可补</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">天气与安全</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/4 阵雨、10/5 多云、10/6 多云转晴</li>
+        <li>4 日起冷空气南下，降温 3–5℃，带薄外套</li>
+        <li>10 月仍有台风可能影响沿海，有预警即改期</li>
+        <li>海边注意风浪，下海以现场公告为准</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">澳门消费与返程</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>公交统一 6 澳门元，<b>不设找零</b>，自备硬币</li>
+        <li>多数商户支持支付宝/微信，备少量现金即可</li>
+        <li>长隆实名制，带身份证；国庆排队久，早到</li>
+        <li>10/6 返程高峰，<b>16:30 前离园上高速</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  澳门通关口岸开放时间 · <a href="https://www.macaotourism.gov.mo/zh-hant/article/before-you-travel/travelling-to-macao" target="_blank">澳门特区旅游局</a><br>
+  横琴/青茂/关闸口岸时间 · <a href="https://www.gov.mo/zh-hant/services/ps-1474/ps-1474i/" target="_blank">澳门特区政府</a><br>
+  往来港澳通行证和签注签发服务指南 · <a href="https://s.nia.gov.cn/mps/mbszy/jmwlgaot/sqtxzqz/201903/t20190316_1024.html" target="_blank">国家移民管理局</a><br>
+  国庆口岸客流预测 · <a href="https://www.nia.gov.cn/n897453/c1745414/content.html" target="_blank">国家移民管理局</a><br>
+  横琴口岸周边停车场收费 · <a href="https://www.hengqin.gov.cn/ghhjsj/2024/xwtz/xwdt/content/post_3748333.html" target="_blank">横琴粤澳深度合作区</a><br>
+  拱北口岸停车场收费 · <a href="https://m.zh.bendibao.com/news/88457.shtm" target="_blank">珠海本地宝</a><br>
+  横琴充电站布局 · <a href="https://www.hengqin.gov.cn/macao_zh_hans/hzqgl/dtyw/dtxx/content/post_3732872.html" target="_blank">横琴粤澳深度合作区</a><br>
+  横琴口岸免费发财车 · <a href="https://m.am.bendibao.com/traffic/987.shtm" target="_blank">澳门本地宝</a><br>
+  澳门轻轨票价 · <a href="https://www.mlm.com.mo/tc/general_ticket.html" target="_blank">澳门轻轨</a><br>
+  澳门市内交通（公交 6 元） · <a href="https://www.macaotourism.gov.mo/zh-hans/travelessential/before-you-travel/local-transportation" target="_blank">澳门特区旅游局</a><br>
+  长隆海洋王国门票 · <a href="http://www.chimelong.com/zh/oceankingdom/" target="_blank">长隆官方</a><br>
+  港珠澳大桥游（蓝海豚岛） · <a href="http://static.nfapp.southcn.com/content/202312/15/c8406409.html" target="_blank">南方+</a><br>
+  澳门天气 · <a href="https://www.smg.gov.mo/" target="_blank">澳门地球物理暨气象局</a>
+  <p style="margin-top:14px">里程、口岸时间、票价、客流为 2026 年 10 月 3 日检索口径，国庆期间浮动较大。<b>签注政策、口岸通关时间、停车收费、门票与天气请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→珠海情侣路→横琴', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'07:00 出发，走广珠西线/广澳高速'},
+    {n:'珠海大剧院·日月贝',city:'珠海',lat:22.2730,lng:113.5860,t:'spot',d:'地标贝壳建筑；傍晚看日落灯光'},
+    {n:'珠海渔女',city:'珠海',lat:22.2660,lng:113.5790,t:'spot',d:'香炉湾，免费；珠海城徽'},
+    {n:'海滨泳场',city:'珠海',lat:22.2620,lng:113.5720,t:'spot',d:'情侣路海边散步骑行'},
+    {n:'横琴（住宿/停车）',city:'珠海横琴',lat:22.1370,lng:113.5440,t:'hotel',d:'紧邻口岸与长隆，住 2 晚'}
+  ]},
+  d2:{label:'D2 澳门一日游', color:'#af52de', pts:[
+    {n:'横琴口岸（过关）',city:'珠海横琴',lat:22.1370,lng:113.5440,t:'transport',d:'24 小时通关，接澳门轻轨莲花站'},
+    {n:'官也街',city:'澳门',lat:22.1543,lng:113.5567,t:'food',d:'手信与美食，水蟹粥、猪扒包'},
+    {n:'威尼斯人',city:'澳门',lat:22.1495,lng:113.5606,t:'spot',d:'人造天空、贡多拉；巴黎人/伦敦人相邻'},
+    {n:'大三巴牌坊',city:'澳门',lat:22.1976,lng:113.5405,t:'spot',d:'澳门地标，恋爱巷/大三巴街'},
+    {n:'议事亭前地',city:'澳门',lat:22.1936,lng:113.5402,t:'spot',d:'老城核心步行区，玫瑰圣母堂'},
+    {n:'澳门旅游塔',city:'澳门',lat:22.1797,lng:113.5369,t:'spot',d:'观光层俯瞰全城，10:00–20:00'}
+  ]},
+  d3:{label:'D3 长隆→佛山', color:'#34c759', pts:[
+    {n:'长隆海洋王国',city:'珠海横琴',lat:22.1060,lng:113.5290,t:'spot',d:'鲸鲨馆、海豚剧场；10:00 开园'},
+    {n:'佛山',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'16:30 离园，约 150 km / 2h 返抵'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[22.4,113.5],zoom:9,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>
