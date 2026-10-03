@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山 ⇄ 下川岛 · 3天2夜海岛攻略（国庆 · 纯电）</title>
+<meta name="description" content="2026国庆 10/4–10/6 佛山出发 3天2夜下川岛攻略：山咀港船班、王府洲沙滩、观音山、大湾牛塘湾，含停车充电、逐日行程、海鲜与预算">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+  --line:rgba(60,60,67,.12); --accent:#0071e3;
+  --red:#ff3b30; --orange:#ff9500; --green:#34c759; --blue:#007aff; --purple:#af52de;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --r:14px; --r2:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;font-size:13.5px;font-weight:500;color:var(--ink2);padding:6px 14px;border-radius:980px;background:#f0f0f3;white-space:nowrap;transition:.2s}
+.nav a:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+
+.hero{padding:52px 0 26px;text-align:center}
+.hero .kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(27px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:10px 0}
+.hero p{font-size:16px;color:var(--ink2);max-width:640px;margin:0 auto}
+.hero .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .tags span{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:980px;background:#fff;box-shadow:var(--sh);color:var(--ink2)}
+
+section{margin-top:44px;scroll-margin-top:64px}
+h2{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .n{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.sub{font-size:14px;color:var(--ink2);margin-bottom:18px;padding-left:40px}
+h3{font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:-.01em}
+
+.card{background:var(--card);border-radius:var(--r2);padding:20px;box-shadow:var(--sh)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+.kpi{background:var(--card);border-radius:var(--r2);padding:18px;box-shadow:var(--sh);border-top:3px solid var(--accent)}
+.kpi.red{border-top-color:var(--red)} .kpi.orange{border-top-color:var(--orange)}
+.kpi.green{border-top-color:var(--green)} .kpi.purple{border-top-color:var(--purple)}
+.kpi .k{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.kpi .d{font-size:13px;color:var(--ink2);line-height:1.5}
+
+.callout{border-radius:var(--r);padding:16px 18px;font-size:14px;line-height:1.65;margin:14px 0}
+.callout.danger{background:rgba(255,59,48,.07);border-left:4px solid var(--red)}
+.callout.warn{background:rgba(255,149,0,.09);border-left:4px solid var(--orange)}
+.callout.ok{background:rgba(52,199,89,.09);border-left:4px solid var(--green)}
+.callout.info{background:rgba(0,113,227,.07);border-left:4px solid var(--accent)}
+
+.todo{display:flex;flex-direction:column;gap:10px}
+.todo .item{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;gap:14px;align-items:flex-start}
+.todo .item input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.todo .item .body{flex:1}
+.todo .item .t{font-size:15px;font-weight:650}
+.todo .item .m{font-size:13px;color:var(--ink2);margin-top:3px}
+.todo .item .due{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.p0{background:rgba(255,59,48,.12);color:var(--red)}
+.p1{background:rgba(255,149,0,.14);color:#b26a00}
+.p2{background:rgba(0,113,227,.1);color:var(--accent)}
+.todo .item input:checked ~ .body{opacity:.42;text-decoration:line-through}
+
+.mapwrap{background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--sh)}
+#map{width:100%;height:420px;border-radius:var(--r);z-index:1}
+.mapctl{display:flex;gap:6px;flex-wrap:wrap;padding:12px 4px 4px}
+.mapctl button{font-size:13px;font-weight:600;padding:7px 15px;border-radius:980px;border:none;background:#f0f0f3;color:var(--ink2);cursor:pointer;transition:.2s;font-family:inherit}
+.mapctl button:hover{background:#e3e3e8}
+.mapctl button.on{background:var(--ink);color:#fff}
+
+.day{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.day .hd{padding:18px 20px 14px;border-bottom:.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.day .hd .badge{flex-shrink:0;width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;line-height:1.1}
+.day .hd .badge .d{font-size:9.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.day .hd .badge .n{font-size:19px}
+.day .hd h4{font-size:18px;font-weight:750;letter-spacing:-.01em}
+.day .hd .meta{font-size:13px;color:var(--ink2);margin-top:2px}
+.day .bd{padding:6px 20px 20px}
+
+.tl{position:relative;padding-left:22px;margin-top:12px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.tl .row{position:relative;padding:8px 0;display:flex;gap:14px}
+.tl .row::before{content:'';position:absolute;left:-22px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px #fff}
+.tl .row.f::before{background:var(--red)}
+.tl .row.t::before{background:var(--ink3)}
+.tl .row.c::before{background:var(--green)}
+.tl .tm{flex-shrink:0;width:64px;font-size:12.5px;font-weight:700;color:var(--ink3);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl .tx{flex:1;font-size:14.5px}
+.tl .tx small{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.tbl th{background:#fafafa;text-align:left;padding:11px 13px;font-weight:700;font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;border-bottom:.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.total td{background:#fafafa;font-weight:750}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .hi{color:var(--red);font-weight:700}
+.tbl .ok{color:var(--green);font-weight:700}
+.scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.scroll .tbl{box-shadow:none;border-radius:0}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.g{background:rgba(52,199,89,.13);color:#1a7f37}
+.pill.r{background:rgba(255,59,48,.11);color:var(--red)}
+.pill.o{background:rgba(255,149,0,.15);color:#b26a00}
+.pill.b{background:rgba(0,113,227,.1);color:var(--accent)}
+
+footer{margin-top:56px;padding-top:24px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.8}
+footer a{color:var(--ink2)}
+
+@media (max-width:600px){
+  .day .hd{padding:15px 16px 12px}
+  .day .bd{padding:4px 16px 16px}
+  .tl .tm{width:54px;font-size:11.5px}
+  #map{height:330px}
+  .hero{padding:36px 0 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s0">结论</a>
+  <a href="#s1">待办</a>
+  <a href="#s2">路线船班</a>
+  <a href="#s3">逐日行程</a>
+  <a href="#s4">吃在下川岛</a>
+  <a href="#s5">住宿</a>
+  <a href="#s6">预算</a>
+  <a href="#s7">避雷</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">2026 国庆 · 10/4 – 10/6 · 台山下川岛</div>
+  <h1>佛山 ⇄ 下川岛 3 天 2 夜</h1>
+  <p>纯电自驾 + 海岛 · 王府洲沙滩 · 观音山 · 大湾牛塘湾 · 环岛看日落</p>
+  <div class="tags">
+    <span>单程约 160 km</span><span>船程约 35 分钟</span>
+    <span>车停山咀港</span><span>2 人 1 车</span>
+  </div>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>这一版怎么定的</h2>
+  <p class="sub">下川岛是<b>离岛</b>，车可以车渡上岛（287 元/单程），但 2 人算下来<b>把车停在山咀港、坐客运船上岛更省更省心</b>。</p>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>日期</th><th>天气</th><th>安排</th><th>住宿</th></tr></thead>
+      <tbody>
+        <tr><td><b>D1 · 10/4</b></td><td><span class="pill o">中雨转阵雨 24–31℃</span></td><td>佛山 → 山咀港（停车）→ 坐船上岛 → 王府洲沙滩</td><td>下川岛王府洲</td></tr>
+        <tr><td><b>D2 · 10/5</b></td><td><span class="pill b">多云/小雨 21–27℃</span></td><td>环岛：观音山 → 大湾 → 牛塘湾 → 王府洲玩水</td><td>下川岛王府洲</td></tr>
+        <tr><td><b>D3 · 10/6</b></td><td><span class="pill g">多云 19–25℃</span></td><td>晨景 → 坐船回山咀港 → 取车返程佛山</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b>四处关键取舍：</b>①<b>车不上岛</b>——车渡往返 287×2≈574 元，而 2 人买"往返船票+接驳车+门票"套票仅 196×2=392 元，<b>停港口坐船省约 220 元</b>；且新能源车车渡需等油车先上船、国庆满船即发不保证班次，折腾。②<b>住王府洲 2 晚</b>——沙滩就在门口，省去每天来回。③<b>10/4 有雨</b>，上岛当天以下午沙滩散步 + 酒店休整为主，把环岛留给天气更好的 10/5。④<b>D3 早走</b>——10/6 返程高峰 15:00–22:00，务必中午前离开台山。
+  </div>
+
+  <div class="grid4">
+    <div class="kpi green">
+      <div class="k">交通设计</div>
+      <div class="v">车停港·人上岛</div>
+      <div class="d">佛山 → 山咀港（约 160 km）停车 → 客运船约 35 分钟到下川岛，岛上租电瓶车环岛。</div>
+    </div>
+    <div class="kpi orange">
+      <div class="k">天气窗口</div>
+      <div class="v">前雨后转好</div>
+      <div class="d">10/4 中雨转阵雨、10/5 多云小雨、10/6 多云。上岛当天避雨，环岛放 10/5。</div>
+    </div>
+    <div class="kpi red">
+      <div class="k">最紧张环节</div>
+      <div class="v">船票 + 车位</div>
+      <div class="d">国庆船班可能调整、车位紧张，建议提前 1–2 天在线订票订车位，提前 40–60 分钟到码头。</div>
+    </div>
+    <div class="kpi purple">
+      <div class="k">核心约束</div>
+      <div class="v">末班 17:30</div>
+      <div class="d">山咀港→下川岛末班约 17:30，下川岛→山咀港末班约 17:00，错过就回不来。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>出发前必办</h2>
+  <p class="sub">点一下可以勾掉。前两项是硬门槛——国庆船票和车位都要提前锁。</p>
+  <div class="todo">
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订下川岛住宿（王府洲，2 晚）</div><div class="m">海景房约 ¥400–700/晚。<b>优先选"酒店 + 2 人往返船票 + 景区门票"套餐</b>，比分开买省。国庆旺季，今天订。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">订船票 / 套票</div><div class="m">下川套票（含往返船票 + 往返接驳车 + 王府洲门票）自由行优惠价约 ¥196/人，需提前预订。渠道：川岛旅游 / 川山群岛旅游网小程序。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">预订山咀港停车位</div><div class="m">小车 30 元/晚、6 元/小时。国庆车位紧张，川山群岛旅游网可在线预订车位，下单时备注车牌号。</div></div><span class="due p0">今天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">确认当天船班时刻</div><div class="m">旺季山咀港→下川岛 08:30 首班、每小时一班、17:30 末班；<b>末班时间会随日落调整</b>，出行前以当天售票窗口公告为准。</div></div><span class="due p1">出发前 1 天</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">纯电补能规划</div><div class="m">佛山→山咀港约 160 km，满电直达往返足够；备选<b>黄茅海服务区（40 桩）</b>、广海服务区/广海渔人码头超充；山咀码头也有南方电网充电站。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">查台风与阵风预警</div><div class="m">10 月预计有 1–2 个台风影响华南沿海；有台风或大风预警时船班会停，出发前查台风路径图。</div></div><span class="due p2">出发前</span></label>
+    <label class="item"><input type="checkbox"><div class="body"><div class="t">备雨具、防晒、泳具与薄外套</div><div class="m">10/4–10/5 有雨，岛上风大；10/5 北风 3–4 级，海边注意保暖。</div></div><span class="due p2">出发前</span></label>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>路线、船班与停车</h2>
+  <p class="sub">切换天数看当天动线，点标记可唤起导航。</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapctl" id="mapctl"></div>
+    <p style="font-size:12px;color:var(--ink2);padding:6px 6px 0;line-height:1.6">底图为<b>高德地图</b>，坐标已做 WGS-84 → GCJ-02 纠偏。海上路段为示意航线，标记为大致位置；<b>导航请点开标记里的「在高德中打开」，位置以高德实时解析为准。</b></p>
+  </div>
+
+  <h3>大路线</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>详情</th></tr></thead>
+      <tbody>
+        <tr><td>去程</td><td>佛山 → 佛开高速 / 黄茅海跨海通道 → 西部沿海高速 → <b>山咀港</b>，约 160 km / 2h</td></tr>
+        <tr><td>上岛</td><td>山咀港停车 → 客运船 → <b>下川岛独湾港</b>，约 35 分钟 → 接驳车至王府洲</td></tr>
+        <tr><td>返程</td><td>下川岛 → 山咀港 → 取车 → 佛山，约 160 km / 2h</td></tr>
+        <tr><td>全程里程</td><td class="num">约 320 km（往返，岛上不开车）</td></tr>
+        <tr><td>过路费</td><td><b class="ok">国庆免费</b>（10/1 00:00 – 10/7 24:00，7 座及以下），以驶离收费站时间为准</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>船班时刻（旺季 4/16–11/15）</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>航线</th><th>首班</th><th>班次</th><th>末班</th><th>航程</th></tr></thead>
+      <tbody>
+        <tr><td><b>山咀港 → 下川岛</b></td><td class="num">08:30</td><td>每小时一班</td><td class="num">17:30</td><td class="num">约 35 分钟</td></tr>
+        <tr><td><b>下川岛 → 山咀港</b></td><td class="num">08:00</td><td>每小时一班</td><td class="num">17:00</td><td class="num">约 35 分钟</td></tr>
+        <tr><td>车渡（可选）</td><td colspan="3">山咀港→下川岛 08:30 首班（连开两班）；下川岛→山咀港 15:00、17:00</td><td>小轿车 ¥287/程</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout danger">
+    <b>末班时间会变：</b>2026 年 9 月 7 日起末班已按日落时间调整过一次，<b>国庆班次也可能临时调整</b>。上岛前务必在售票窗口确认当天末班，D3 千万别拖到下午才走。
+  </div>
+
+  <h3>停车与费用</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>标准</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>山咀港停车（小车）</td><td class="num">6 元/小时，30 元/晚</td><td>20 分钟内免费；超过 36 小时每半小时 4 元，可续单</td></tr>
+        <tr><td>停车位预订</td><td class="num">在线预订</td><td>川山群岛旅游网可订车位，下单备注车牌号；国庆车位紧张</td></tr>
+        <tr><td>港区管制</td><td>国庆"大循环"</td><td>自驾车需听从现场指引，预留排队时间</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>纯电补能点</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>位置</th><th>充电设施</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>黄茅海服务区</td><td class="num">40 个新能源汽车充电桩</td><td><span class="pill g">首选</span> 往返均顺路</td></tr>
+        <tr><td>广海服务区 / 广海渔人码头</td><td class="num">广海高速出口充电站；渔人码头液冷超充</td><td><span class="pill g">首选</span> 距山咀港较近</td></tr>
+        <tr><td>山咀码头</td><td class="num">南方电网充电站（川岛镇山咀码头站）</td><td><span class="pill b">兜底</span> 停车期间可补</td></tr>
+        <tr><td>台山市区</td><td class="num">累计充电站 734 个、充电桩约 1000 个</td><td><span class="pill o">备选</span> 进城时补</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>纯电节奏建议：</b>佛山→山咀港仅约 160 km，<b>满电出发、往返都够，中途基本不用补能</b>。关键点是——车要在港口停放 2–3 天，<b>返程前记得把电留够</b>；可在山咀码头充电站补一次。全程约 320 km，电费约 ¥70–90。<b>这趟真正的变量是船班和车位，不是电。</b>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>逐日行程</h2>
+  <p class="sub">一天上岛、一天环岛、一天返程。</p>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#007aff"><div class="d">D1</div><div class="n">4</div></div>
+      <div><h4>佛山 → 山咀港 → 下川岛</h4><div class="meta">10 月 4 日 · 中雨转阵雨 · 车程约 2h + 船程约 35 分钟</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row t"><div class="tm">07:00</div><div class="tx"><b>佛山出发</b><small>满电出发，走佛开高速 / 黄茅海跨海通道；早走避开出城车流</small></div></div>
+        <div class="row c"><div class="tm">08:20</div><div class="tx"><b>黄茅海服务区小憩</b><small>40 桩；电量充足可不停，直接开往山咀港</small></div></div>
+        <div class="row h"><div class="tm">09:20</div><div class="tx"><b>抵山咀港，停好车</b><small>停第一/第二停车场，记好车位；预留排队时间</small></div></div>
+        <div class="row"><div class="tm">09:50</div><div class="tx"><b>取票、候船</b><small>建议提前 40–60 分钟到码头；确认当天末班时刻</small></div></div>
+        <div class="row t"><div class="tm">10:30</div><div class="tx"><b>山咀港 → 下川岛（客运船）</b><small>约 35 分钟；雨天甲板湿滑，注意安全</small></div></div>
+        <div class="row h"><div class="tm">11:15</div><div class="tx"><b>抵独湾港，接驳车至王府洲</b><small>套票含往返接驳车票</small></div></div>
+        <div class="row f"><div class="tm">12:00</div><div class="tx"><b>午餐：海鲜大排档</b><small>王府洲一带；10/4 有雨，先吃饱再安顿</small></div></div>
+        <div class="row h"><div class="tm">13:30</div><div class="tx"><b>入住王府洲酒店</b><small>海景房，沙滩就在门口</small></div></div>
+        <div class="row f"><div class="tm">15:00</div><div class="tx"><b>王府洲沙滩</b><small>阵雨间歇可下沙滩散步；下雨则酒店休整、傍晚再出门</small></div></div>
+        <div class="row f"><div class="tm">18:30</div><div class="tx"><b>晚餐：海鲜</b><small>石斑、花蟹、生蚝、海胆，清蒸白灼为主</small></div></div>
+      </div>
+      <div class="callout warn" style="margin-bottom:0"><b>D1 有雨，行程留弹性：</b>10/4 中雨转阵雨，沙滩和环岛体验会打折。<b>建议把"重头戏"留给 10/5</b>——当天以上岛、安顿、吃海鲜为主，别硬排户外。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#af52de"><div class="d">D2</div><div class="n">5</div></div>
+      <div><h4>下川岛环岛一日</h4><div class="meta">10 月 5 日 · 多云/小雨 · 全程在岛，租电瓶车环岛</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">06:30</div><div class="tx"><b>王府洲海边晨景</b><small>看日出、赶海；清晨人最少</small></div></div>
+        <div class="row"><div class="tm">08:00</div><div class="tx"><b>早餐</b><small>酒店含早则店内解决</small></div></div>
+        <div class="row c"><div class="tm">09:00</div><div class="tx"><b>租电瓶车</b><small>约 ¥60–80/天；岛上坡多，注意电量与刹车</small></div></div>
+        <div class="row f"><div class="tm">09:30</div><div class="tx"><b>观音山</b><small>登高俯瞰全岛与海景，是岛上最佳观景点</small></div></div>
+        <div class="row f"><div class="tm">11:00</div><div class="tx"><b>大湾 / 牛塘湾</b><small>原始海湾、礁石海岸，人少清净</small></div></div>
+        <div class="row f"><div class="tm">12:30</div><div class="tx"><b>午餐：渔村海鲜</b><small>东湾大澳一带渔港区域</small></div></div>
+        <div class="row f"><div class="tm">14:00</div><div class="tx"><b>王府洲沙滩玩水</b><small>下海注意景区公告与救生员示意；10/5 北风 3–4 级</small></div></div>
+        <div class="row f"><div class="tm">17:00</div><div class="tx"><b>米岩 / 礁石区看日落</b><small>礁石湿滑，别攀爬</small></div></div>
+        <div class="row f"><div class="tm">19:00</div><div class="tx"><b>晚餐：东湾大澳海边食街</b><small>海鲜大排档集中，现点现做</small></div></div>
+      </div>
+      <div class="callout info" style="margin-bottom:0"><b>环岛顺序按"先远后近"排：</b>上午电量足、体力好时跑观音山和大湾/牛塘湾，下午回王府洲玩水、傍晚看日落，避免天黑后骑电瓶车跑远路。</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="hd">
+      <div class="badge" style="background:#34c759"><div class="d">D3</div><div class="n">6</div></div>
+      <div><h4>下川岛 → 山咀港 → 佛山</h4><div class="meta">10 月 6 日 · 多云 · 返程（全程最需卡时间的一天）</div></div>
+    </div>
+    <div class="bd">
+      <div class="tl">
+        <div class="row f"><div class="tm">07:00</div><div class="tx"><b>海边晨景 + 早餐</b><small>最后感受一下海岛清晨</small></div></div>
+        <div class="row"><div class="tm">08:30</div><div class="tx"><b>退房，乘接驳车至码头</b><small>提前到独湾港候船</small></div></div>
+        <div class="row t"><div class="tm">09:30</div><div class="tx"><b>下川岛 → 山咀港（客运船）</b><small>约 35 分钟；船班 08:00 起每小时一班</small></div></div>
+        <div class="row h"><div class="tm">10:15</div><div class="tx"><b>取车</b><small>出港到停车场取车，检查电量</small></div></div>
+        <div class="row c"><div class="tm">10:40</div><div class="tx"><b>上高速返程</b><small>西部沿海高速 → 佛山，约 160 km / 2h</small></div></div>
+        <div class="row"><div class="tm">12:40</div><div class="tx"><b>抵佛山</b><small>赶在 15:00 返程高峰之前</small></div></div>
+      </div>
+      <div class="callout danger" style="margin-bottom:0"><b>D3 时间要卡紧：</b>10/6 返程高峰在 <b>15:00–22:00</b>，易堵路段为西部沿海高速中和立交至南北、广海至山咀隧道。<b>务必坐 10:00 前的船回山咀港</b>，中午前上高速，才能稳稳在下午 1 点前到家。</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <b>时间富余时的加项：</b>返程若还早，可在台山市区加<b>梅家大院</b>（《让子弹飞》取景地，免费看外观）或<b>都斛海鲜街</b>（采购生蚝、奄仔蟹带回），都在返程方向、不绕路。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>吃在下川岛</h2>
+  <p class="sub">岛上靠海吃海，清蒸白灼为主，吃的是新鲜。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>地点</th><th>必吃</th><th>参考人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>王府洲旅游区周边</b></td><td>白灼虾、椒盐濑尿虾、清蒸石斑、海胆炒饭</td><td class="num">¥70–120</td></tr>
+        <tr><td><b>东湾大澳海边食街</b></td><td>生猛海鲜大排档，渔翁酒家、渔港餐厅等近海边</td><td class="num">¥80–150</td></tr>
+        <tr><td><b>东湾迎滨餐厅一带</b></td><td>生猛海鲜 + 农家菜，可看海景</td><td class="num">¥80–150</td></tr>
+        <tr><td>特色品类</td><td>石斑、龙虾、青蟹、花蟹、对虾、皇冠螺、翡翠贻贝、生蚝、海胆</td><td class="num">按斤计</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2)">岛上餐饮集中、选择有限，<b>点海鲜务必先问价、确认是否按斤计价</b>，避免结账争议；景区内（王府洲）比渔港大排档略贵，想吃划算就往东湾大澳渔港方向走。</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>住宿</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>晚次</th><th>区域</th><th>单价参考</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>D1、D2（10/4、10/5）</td><td>下川岛 · 王府洲旅游区</td><td class="num">约 ¥400–700/间/晚</td><td>沙滩就在门口，海景房溢价明显；<b>建议订"酒店 + 2 人往返船票 + 门票"套餐</b>，比分开买省</td></tr>
+        <tr><td>备选</td><td>下川岛 · 川岛镇 / 大湾一带</td><td class="num">约 ¥398–430/间/晚</td><td>离沙滩稍远，价格略低，选择较少</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-bottom:0"><b>套餐是这趟的关键省钱点：</b>市面上有"1 晚 + 2 人往返船票 + 王府洲景区套票"约 ¥683–752 起的组合，也有"2 天 1 晚 + 2 人往返船票 + 岛上接驳车票 + 王府洲门票"约 ¥578 的套餐。<b>订房时先问有没有含船票的套餐</b>，通常比"单订房 + 单买套票"更便宜。</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>预算总表</h2>
+  <p class="sub">2 人 1 车、纯电、车停山咀港、3 天 2 夜。</p>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>项目</th><th>明细</th><th>合计（2 人）</th><th>人均</th></tr></thead>
+      <tbody>
+        <tr><td><b>充电</b></td><td>全程约 320 km，快充 ¥1.3–1.8/kWh、电耗约 15 kWh/100km</td><td class="num">¥70–90</td><td class="num">¥35–45</td></tr>
+        <tr><td>过路费</td><td>国庆免费（10/1–10/7，7 座及以下）</td><td class="num ok">¥0</td><td class="num ok">¥0</td></tr>
+        <tr><td>山咀港停车</td><td>小车 30 元/晚 × 2 晚</td><td class="num">¥60</td><td class="num">¥30</td></tr>
+        <tr><td><b>船票 + 门票</b></td><td>下川套票 ¥196/人（含往返船票 + 往返接驳车 + 王府洲门票）</td><td class="num">¥392</td><td class="num">¥196</td></tr>
+        <tr><td><b>住宿</b></td><td>1 间 × 2 晚（王府洲海景房）</td><td class="num">¥800–1,400</td><td class="num">¥400–700</td></tr>
+        <tr><td>餐饮</td><td>2 人 × 3 天 × ¥150–250/人/天（海鲜为主）</td><td class="num">¥900–1,500</td><td class="num">¥450–750</td></tr>
+        <tr><td>岛上交通</td><td>电瓶车 ¥60–80/天 × 2 天</td><td class="num">¥120–160</td><td class="num">¥60–80</td></tr>
+        <tr><td>停车杂费</td><td>景区停车、零食、防晒等</td><td class="num">¥100–200</td><td class="num">¥50–100</td></tr>
+        <tr class="total"><td>合计</td><td></td><td class="num hi">约 ¥2,442–3,802</td><td class="num hi">约 ¥1,221–1,901</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <b>开销弹性在住宿和海鲜：</b>王府洲海景房 400 起 vs 700，两晚差 600；海鲜放开吃和按量点，差 500+。全走性价比（含票套餐 + 非一线房 + 渔港大排档）人均可压到 ¥1,300 以内；要海景度假 + 顿顿海鲜则奔 ¥1,900。
+  </div>
+
+  <h3>省钱杠杆</h3>
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>做法</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>订"酒店 + 往返船票 + 门票"套餐，而非分开买</td><td class="num ok">省 ¥150–250</td></tr>
+        <tr><td>车停山咀港坐客运船，而非车渡上岛</td><td class="num ok">省约 ¥220</td></tr>
+        <tr><td>住非一线海景房（川岛镇方向）</td><td class="num ok">省 ¥200–400</td></tr>
+        <tr><td>海鲜去东湾大澳渔港大排档，避开景区内</td><td class="num ok">省 ¥150–300</td></tr>
+        <tr><td>电瓶车只租 1 天，其余步行</td><td class="num ok">省 ¥60–80</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>避雷清单</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">船班与上岛</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>末班约 17:30（去）/ 17:00（回），<b>会随日落调整，以当天公告为准</b></li>
+        <li>国庆车渡"满船即发"，网购票不保证指定航班</li>
+        <li>新能源车车渡需等油车先上船，较折腾</li>
+        <li>建议提前 40–60 分钟到码头候船</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">停车与港区</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>小车 30 元/晚、6 元/小时，20 分钟内免费</li>
+        <li>国庆车位紧张，<b>提前在线预订并备注车牌</b></li>
+        <li>港区国庆"大循环"管制，听从现场指引</li>
+        <li>记好车位号，取车时省时间</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">天气与安全</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/4 中雨转阵雨、10/5 多云小雨、10/6 多云</li>
+        <li>10 月有 1–2 个台风可能影响华南，有预警即改期</li>
+        <li>下海以景区公告与救生员示意为准</li>
+        <li>礁石区（米岩、牛塘湾）湿滑，<b>别攀爬</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">返程与消费</h3>
+      <ul style="font-size:14px;color:var(--ink2);padding-left:20px;line-height:1.9">
+        <li>10/6 返程高峰 15:00–22:00，<b>中午前上高速</b></li>
+        <li>易堵：西部沿海中和立交至南北、广海至山咀隧道</li>
+        <li>海鲜<b>先问价、确认按斤计</b>，避免结账争议</li>
+        <li>岛上物价偏高，零食饮水可自带</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>关键信息源</b><br>
+  台山港航 · 川岛客运航班表 · <a href="http://www.cnts.gov.cn/zfgzbm/sjtysj/ggqsydwxxgk/content/post_3423601.html" target="_blank">台山市政府</a><br>
+  下川岛车渡航班与价格 · <a href="https://www.cdaaaa.com/ferrys/shanjugang-1-0-3-1" target="_blank">川岛旅游</a><br>
+  国庆车渡航班调整通知 · <a href="https://www.cdaaaa.com/raiders/show_34.html" target="_blank">川岛旅游</a><br>
+  下川套票与门票优惠 · <a href="https://www.chuanshanqundao.com/Mobile/News/Info-3472.html" target="_blank">川山群岛旅游网</a><br>
+  山咀港停车收费标准 · <a href="https://www.chuanshanqundao.com/Mobile/News/Info-3471.html" target="_blank">川山群岛旅游网</a><br>
+  黄茅海跨海通道收费 · <a href="http://www.cnts.gov.cn/tssrmzf/tsyw/tskx/content/post_3253460.html" target="_blank">台山市政府</a><br>
+  黄茅海服务区 40 个充电桩 · <a href="http://www.cnts.gov.cn/tssrmzf/tsyw/tskx/content/post_3461265.html" target="_blank">台山市政府</a><br>
+  江门交警 · 国庆出行指南 · <a href="http://news.qq.com/rain/a/20260929A0692J00" target="_blank">江门交警</a><br>
+  下川岛天气 · <a href="https://www.zgjia.com/jingdian/taishan_xiachuandao/" target="_blank">中国天气</a>
+  <p style="margin-top:14px">里程、船班、票价、限流规则均为 2026 年 10 月 3 日检索口径，国庆期间浮动较大。<b>船班时刻、停车位、住宿余房、台风预警请以出行当日官方信息为准。</b></p>
+</footer>
+
+</div>
+
+<script>
+const CITIES = {
+  d1:{label:'D1 佛山→山咀港→下川岛', color:'#007aff', pts:[
+    {n:'佛山（出发）',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'07:00 出发，走佛开/黄茅海跨海通道'},
+    {n:'黄茅海服务区',city:'台山',lat:22.0200,lng:112.9200,t:'charge',d:'40 桩；电量足可不停'},
+    {n:'山咀港（停车）',city:'台山',lat:21.8450,lng:112.7350,t:'transport',d:'停第一/第二停车场，约 30 元/晚'},
+    {n:'下川岛·独湾港',city:'台山',lat:21.6580,lng:112.5980,t:'transport',d:'客运船约 35 分钟抵达'},
+    {n:'王府洲沙滩',city:'台山',lat:21.6350,lng:112.5750,t:'spot',d:'主沙滩，接驳车直达'}
+  ]},
+  d2:{label:'D2 下川岛环岛', color:'#af52de', pts:[
+    {n:'王府洲（晨景）',city:'台山',lat:21.6350,lng:112.5750,t:'spot',d:'06:30 看日出、赶海'},
+    {n:'观音山',city:'台山',lat:21.6650,lng:112.5500,t:'spot',d:'登高俯瞰全岛'},
+    {n:'大湾',city:'台山',lat:21.6800,lng:112.5700,t:'spot',d:'原始海湾'},
+    {n:'牛塘湾',city:'台山',lat:21.6180,lng:112.6200,t:'spot',d:'礁石海岸，人少清净'},
+    {n:'米岩（日落）',city:'台山',lat:21.6200,lng:112.5600,t:'spot',d:'礁石区看日落'}
+  ]},
+  d3:{label:'D3 下川岛→佛山', color:'#34c759', pts:[
+    {n:'王府洲（退房）',city:'台山',lat:21.6350,lng:112.5750,t:'hotel',d:'08:30 退房，接驳车至码头'},
+    {n:'下川岛·独湾港',city:'台山',lat:21.6580,lng:112.5980,t:'transport',d:'09:30 坐船回山咀港'},
+    {n:'山咀港（取车）',city:'台山',lat:21.8450,lng:112.7350,t:'transport',d:'取车、检查电量'},
+    {n:'佛山',city:'佛山',lat:23.0218,lng:113.1219,t:'transport',d:'约 160 km / 2h 返抵'}
+  ]}
+};
+const EMOJI={transport:'🚗',spot:'📍',food:'🥢',hotel:'🏨',charge:'⚡'};
+
+/* WGS-84 → GCJ-02 纠偏，保证标记与高德底图对齐 */
+const PI=3.14159265358979323846,AXIS=6378245.0,EE=0.00669342162296594323;
+function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
+function tLat(x,y){let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}
+function tLng(x,y){let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}
+function gcj(lng,lat){
+  if(outOfChina(lng,lat)) return [lng,lat];
+  let dLat=tLat(lng-105,lat-35), dLng=tLng(lng-105,lat-35);
+  const radLat=lat/180*PI; let m=Math.sin(radLat); m=1-EE*m*m;
+  const sm=Math.sqrt(m);
+  dLat=(dLat*180)/((AXIS*(1-EE))/(m*sm)*PI);
+  dLng=(dLng*180)/(AXIS/sm*Math.cos(radLat)*PI);
+  return [lng+dLng,lat+dLat];
+}
+function ll(lat,lng){const g=gcj(lng,lat);return [g[1],g[0]];}
+
+const map = L.map('map',{center:[22.3,112.9],zoom:8,scrollWheelZoom:false});
+/* 高德地图底图瓦片 */
+const GAODE='https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}';
+const FALLBACK='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const gaodeLayer=L.tileLayer(GAODE,{subdomains:'1234',maxZoom:18,attribution:'© 高德地图'}).addTo(map);
+let tileErr=0,swapped=false;
+gaodeLayer.on('tileerror',()=>{
+  if(++tileErr>8 && !swapped){ swapped=true; map.removeLayer(gaodeLayer);
+    L.tileLayer(FALLBACK,{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(map); }
+});
+
+function mkIcon(color,e){
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)">${e}</div>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15]});
+}
+
+let layers=[];
+function draw(key){
+  layers.forEach(l=>map.removeLayer(l)); layers=[];
+  const list = key==='all' ? Object.values(CITIES) : [CITIES[key]];
+  const all=[];
+  list.forEach(c=>{
+    const pts=[];
+    c.pts.forEach(p=>{
+      const pos=ll(p.lat,p.lng);
+      const kw=encodeURIComponent((p.city||'')+p.n);
+      const m=L.marker(pos,{icon:mkIcon(c.color,EMOJI[p.t]||'📍')}).addTo(map)
+        .bindPopup(`<b>${p.n}</b><br><span style="color:#86868b">${p.d}</span><br><a href="https://uri.amap.com/search?keyword=${kw}&callnative=1" target="_blank">🧭 在高德中打开</a>`);
+      layers.push(m); pts.push(pos); all.push(pos);
+    });
+    if(pts.length>1) layers.push(L.polyline(pts,{color:c.color,weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map));
+  });
+  if(all.length) map.fitBounds(all,{padding:[40,40],maxZoom:11});
+}
+
+const ctl=document.getElementById('mapctl');
+const btns=[['all','全部']].concat(Object.entries(CITIES).map(([k,v])=>[k,v.label]));
+btns.forEach(([k,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; if(i===0) b.classList.add('on');
+  b.onclick=()=>{ ctl.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); draw(k); };
+  ctl.appendChild(b);
+});
+draw('all');
+</script>
+</body>
+</html>
